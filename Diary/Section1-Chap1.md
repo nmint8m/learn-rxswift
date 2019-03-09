@@ -18,7 +18,7 @@ Nói theo cách dễ hiểu hơn:
 
 > RxSwift, in its essence, simplifies developing asynchronous programs by allowing your code to react to new data and process it in a sequential, isolated manner.
 > 
-> Hiểu nôm na là: RxSwift giúp đơn giản hoá quá trình phát triển ứng dụng bất đồng bộ bằng cách cho phép code của mình tương tác với data và xử lý chúng theo một cách tuần tự và độc lập.
+> Hiểu nôm na là: RxSwift giúp đơn giản hoá quá trình phát triển ứng dụng bất đồng bộ bằng cách cho phép code của bạn tương tác với data và xử lý chúng theo một cách tuần tự và độc lập.
 
 ### I. Introduction to asynchronous programming
 
@@ -49,7 +49,7 @@ Dù sao đi nữa thì những API liệt kê ở trên đều vô cùng xuất 
 
 ![Image 1][Image 1]
 
-Trước khi kết thúc section này và cho ví dụ về ngữ cảnh để dễ hiểu hơn, chúng mình thử so sánh 2 đoạn code sau: `synchronous` và `asynchronous`. 
+Trước khi kết thúc section này và cho ví dụ về ngữ cảnh để dễ hiểu hơn, chúng ta thử so sánh 2 đoạn code sau: `synchronous` và `asynchronous`. 
 
 ##### a. Synchronous code
 
@@ -114,7 +114,7 @@ __State và shared mutable state__
 
 `State` rất khó để định nghĩa rõ ràng.
 
-Ví dụ: Mọi chuyện đều ổn khi bạn sử dụng laptop sau khi mới bật nó lên. Cho đến khi bạn xài nó được một vài ngày hay thậm chí một vài tuần chả hạn, laptop của bạn thỉnh thoảng lại bị treo. Lúc đó, cả hardware và software đều duy trì giống hệt lúc đầu, tuy nhiên, cái thay đổi là state. Laptop sẽ lại chạy ổn khi restart.
+Ví dụ: Mọi chuyện đều ổn khi bạn sử dụng laptop sau khi mới bật nó lên đúng hem. Cho đến khi bạn xài nó được một vài ngày hay thậm chí một vài tuần chả hạn, laptop của bạn thỉnh thoảng lại bị treo. Lúc đó, cả hardware và software đều duy trì giống hệt lúc đầu, tuy nhiên, cái thay đổi là state. Laptop sẽ lại chạy ổn khi restart.
 
 Data trong bộ nhớ hoặc trong disk, tất cả những nhân tố do user input, các bản ghi còn tồn tại sau khi fetch data tư cloud service - tổng thể của tất cả những thứ đó là state của laptop.
 
@@ -146,7 +146,7 @@ Mỗi lần bạn sửa data được lưu trong disk hoặc update text của m
 
 Có nghĩa là như vầy, khi mình thay đổi state, mà không có tác dụng gì hết, tỉ dụ như là update UI ngay lập tức, thì việc thay đổi trên rất chy là vô ích.
 
-Vấn đề khi đối mặt với việc tạo nên side effects là làm sao cho nó có thể controlled được. Mình cần phải xác định được đoạn code nào sẽ tạo ra side effect, đoạn nào chỉ xử lý và xuất data. 
+Vấn đề khi đối mặt với việc tạo nên side effects là làm sao cho nó có thể controlled được. Bạn cần phải xác định được đoạn code nào sẽ tạo ra side effect, đoạn nào chỉ xử lý và xuất data. 
 
 Mục đích RxSwift nhằm giải quyết những issue đã kể ra phía trên bởi một số khái niệm sau. 
 
@@ -220,6 +220,29 @@ Mình cũng subcribe error event bằng cách khai báo trong closure `onError`.
 
 Cuối cùng, để handle khi event kết thúc, mình khai báo trong closure `onCompleted` là mình sẽ push view controller mới và hiển thị file đã download. 
 
+__b. Infinite observable sequences__
+
+Không giống như tác vụ download hay những task tương tự, kiểu mà sẽ kết thúc theo cách tự nhiên hay bắt buộc, còn một loại tác vụ khác không bao giờ kết thúc.
+
+![Image 4][Image 4]
+
+Giống như đối với việc user không bao giờ xoay device, nhưng nó đâu có nghĩa là chuỗi event đấy kết đã kết thúc. Nó chỉ có nghĩa là không có bất cứ event nào được phát ra. Trong RxSwift, bạn có thể viết code như này để handle xoay device:
+
+```swift
+UIDevice.rx.orientation
+  .subscribe(onNext: { current in
+    switch current {
+      case .landscape:
+        ... re-arrange UI for landscape
+      case .portrait:
+        ... re-arrange UI for portrait
+    }
+})
+```
+
+`UIDevice.rx.orientation` ở đây là một control property tưởng tượng thôi ợ, mục đích tạo ra `Observable<Orientation>`. Mình subscribe nó và update UI theo orientation hiện tại. Mình sẽ skip `onError` và `onCompleted` parameter, bởi những event này không bao giờ được phát ra bởi observable này.
+
+![Image 5][Image 5]
 ## More
 
 Quay lại [RxSwiftDiary's Menu][Diary]
