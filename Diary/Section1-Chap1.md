@@ -1,6 +1,6 @@
 *Written by: __Nguyen Minh Tam__*
 
-# Section 1: Getting started with RxSwift
+# <img src="https://github.com/nmint8m/rxswiftdiary/blob/master/Image/img-rx.png" height ="30"> Section 1: Getting started with RxSwift
 
 Mục tiêu:
 
@@ -8,7 +8,7 @@ Mục tiêu:
 - Solution.
 - Các class cơ bản trong foundation của Rx framework.
 
-## Chapter 1: Hello RxSwift
+## <img src="https://github.com/nmint8m/rxswiftdiary/blob/master/Image/img-rx.png" height ="25"> Chapter 1: Hello RxSwift
 
 RxSwift là gì?
 
@@ -78,7 +78,7 @@ Kết quả như sau:
 
 ##### b. Asynchronous code
 
-Cũng một đoạn code như thế, nhưng giả sử mỗi vòng lặp là một reaction cho một cái tap trên button. Bởi user liên tục tap lên button, app sẽ liên tục print ra element tiếp theo.
+Cũng một đoạn code như thế, nhưng giả sử mỗi vòng lặp là một reaction cho một cái tap trên button. Khi user liên tục tap lên button, app sẽ liên tục print ra element tiếp theo. Nhớ là đặt đoạn code này trong ngữ cảnh được đề cập bên trên nhé.
 
 ```swift
 var array = [1, 2, 3]
@@ -91,10 +91,10 @@ var currentIndex = 0
   }
 }
 ```
-Vấn đề cốt lõi mà viết code asynchronous là:
+Tới đây ta có thể nhận ra được vấn đề cốt lõi khi viết code asynchronous cần chú ý, đó là:
 
-- thứ tự công việc được thực hiện
-- shared mutable data
+- Thứ tự công việc được thực hiện
+- Shared mutable data
 
 May mắn thay, dăm ba cái vấn đề này, RxSwift xử lý bá lắm rồi.
 
@@ -114,7 +114,7 @@ __State và shared mutable state__
 
 `State` rất khó để định nghĩa rõ ràng.
 
-Ví dụ: Mọi chuyện đều ổn khi bạn sử dụng laptop sau khi bật nó lên. Cho đến khi bạn xài nó được một vài ngày hay thậm chí một vài tuần chả hạn, laptop của bạn thỉnh thoảng lại bị treo. Lúc đó, cả hardware và software đều duy trì giống hệt lúc đầu, tuy nhiên, cái thay đổi là state. Laptop sẽ lại chạy ổn khi restart.
+Ví dụ: Mọi chuyện đều ổn khi bạn sử dụng laptop sau khi mới bật nó lên. Cho đến khi bạn xài nó được một vài ngày hay thậm chí một vài tuần chả hạn, laptop của bạn thỉnh thoảng lại bị treo. Lúc đó, cả hardware và software đều duy trì giống hệt lúc đầu, tuy nhiên, cái thay đổi là state. Laptop sẽ lại chạy ổn khi restart.
 
 Data trong bộ nhớ hoặc trong disk, tất cả những nhân tố do user input, các bản ghi còn tồn tại sau khi fetch data tư cloud service - tổng thể của tất cả những thứ đó là state của laptop.
 
@@ -167,9 +167,62 @@ __Reactive systems__
 - Elastic: Code handle nhiều công việc
 - Message driven: Các component sử dụng message-based communication để nâng cao tính reusability và tính độc lập, tách rời khỏi lifecycle và sự implementation của các class.
 
+### II. Foundation of RxSwift
+
+Rx code sử dụng 3 building block chính sau: observables, operators và schedulers.
+
+#### 1. Observables
+
+Class `Observable<T>` cho phép phần foundation của Rx code khả năng cung cấp một chuỗi các event một cách bất đồng bộ, mà chuỗi event này có thể nắm giữ một immutable snapshot của data T. Nói theo cách đơn giản, nó cho phép class subcribe value được phát ra (emitted) bởi một class khác bất kể khi nào.
+
+Class `Observable<T>`cho phép một hay nhiều observer phản ứng (react) với tất cả event trong real time và update app UI, hoặc là xử lý và sử dụng những dữ liệu mới hoặc có sẵn.
+
+Protocol `ObservableType` (protocol mà `Observable<T>` conform) trông quá chy là đơn giản. Một `Observable` có thể phát ra (tương đương một `Observer` có thể nhận được) chỉ duy nhất 3 loại event:
+
+- Next event: Là sự kiện carry data value mới nhất (cũng có thể nói nó carry next đata value). Đây chính là cách mà `observer` nhận value.
+- Completed event: Là sự kiện kết thúc thành công chuỗi event. Có nghĩa là `Observable` hoàn thành lifecycle của nó một cách thành công và sẽ không nhận thêm bất kỳ một event nào cả.
+- Error event: `Observable` kết thúc vì error và sẽ không nhận thêm bất kỳ một event nào cả.
+
+Khi nói về những event bất đồng bộ được phát ra, chúng ta có thể mô tả trực quan chúng trên một timeline. Ví dụ timeline của một `Observable<Int>`:
+
+![Image 2][Image 2]
+
+Nói chung lại là `Observable` có thể phát bất cứ thứ gì trong Rx. Vì nó universal như thế nên chúng ta có thể tạo ra app logic phức tạp nhường nào cũng cân được. Bởi vì không có giả thuyết nào được đặt ra cho môi trường của `Observable` hoặc `Observer`, vậy nên việc sử dụng event sequence lúc này hoàn toàn linh hoạt. Bây giờ bạn chả cần phải xài delegate protocol hay là closure để các class giao tiếp với nhau.
+
+![Image 3][Image 3]
+
+Để thêm vài cái nhìn sinh động cho các trường hợp trong real life, hãy xem xét hai loại observable sequence sau: finite và infinite.
+
+__a. Finite observable sequences__
+
+Một số observable sequence, có thể phát 0, 1 hay là nhiều value và tới một thời điểm, nó kết thúc thành công hoặc là kết thúc bởi error.
+
+Workflow sau mô tả chính xác lifecycle của observable trên. Ví dụ về download file trên Internet:
+
+```swift 
+API.download(file: "http://www...")
+  .subscribe(onNext: { data in
+    ... append data to temporary file
+  },
+  onError: { error in
+    ... display error to user
+  },
+  onCompleted: {
+    ... use downloaded file
+  })
+```
+
+`API.download(file:)` trả về một instance `Observable<Data>`, phát ra Data value lấy từ các gói data trên network. 
+
+Mình subcribe next event bằng cách khai báo trong closure `.onNext`. Trong ví dụ download file này, mình sẽ thêm data nhận được vào file tạm thời trên disk.
+
+Mình cũng subcribe error event bằng cách khai báo trong closure `onError`. Trong closure ấy, mình xử lý và hiển thị `error.localizedDescription` trên alert box.
+
+Cuối cùng, để handle khi event kết thúc, mình khai báo trong closure `onCompleted` là mình sẽ push view controller mới và hiển thị file đã download. 
+
 ## More
 
-Back to [RxSwift Diary Menu][Diary]
+Quay lại [RxSwiftDiary's Menu][Diary]
 
 ---
 
