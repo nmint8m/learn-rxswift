@@ -8,8 +8,8 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 
 ### Section I: Getting started with RxSwift
 
-- [Chapter 1: Hello RxSwift][Chapter 1] `[/WIP]`
-- [Chapter 2: Observanles]() `[/WIP]`
+- [Chapter 1: Hello RxSwift][Chapter 1]
+- [Chapter 2: Observables][Chapter 2] `[/WIP]`
 - [Chapter 3: Subjects]() `[/WIP]`
 - [Chapter 4: Observables and Subjects in practice]() `[/WIP]`
 
@@ -56,6 +56,7 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 
 [RxSwift Logo]: https://github.com/nmint8m/rxswiftdiary/blob/master/Image/img-rx.png=50x "RxSwift Logo"
 
-[Chapter 1]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chap1.md "Hello RxSwift"
+[Chapter 1]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter1.md "Hello RxSwift"
+[Chapter 2]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter2.md "Observables"
 
 [Reference 1]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"
