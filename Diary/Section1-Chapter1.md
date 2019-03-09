@@ -243,11 +243,100 @@ UIDevice.rx.orientation
 `UIDevice.rx.orientation` ở đây là một control property tưởng tượng thôi ợ, mục đích tạo ra `Observable<Orientation>`. Mình subscribe nó và update UI theo orientation hiện tại. Mình sẽ skip `onError` và `onCompleted` parameter, bởi những event này không bao giờ được phát ra bởi observable này.
 
 ![Image 5][Image 5]
+
+__Operators__
+
+`ObservableType` và cách implementation của class `Observable` bao gồm rất nhiều method trừu tượng hoá các phần khác nhau của một công việc bất đồng bộ, có thể dễ quản lý khi cần implement logic phức tạp hơn.
+
+Bởi vì chúng độc lập và dễ quản lý, những method này thường được nhắc đến như là `Operator` (phép toán tử). Vì những `Operator` này thường lấy đầu vào bất đồng bộ, và cho ra kết quả mà không tạo ra side effect, nên chúng có thể quẩy với nhau khá tốt.
+
+Ví dụ cho phép toán `(5 + 6) * 10 - 2`, chúng ta áp dụng các operator `*`, `()`, `+`, `-` theo trình tự đã định trước cho input data, xử lý tuần tự để cuối cùng lấy output.
+
+Tương tự cho Rx, chúng ta có thể áp dụng các Rx operator cho input được phát bởi một `Observable` đến các bước xử lý độc lập cho đến khi biểu thức được hoàn thành và cho ra kết quả cuối, cái mà chúng ta sử dụng để tạo ra side effect.
+
+Đây là ví dụ về lắng nghe sự thay đổi của device orientation, sử dụng thêm một vài operator phổ biến của Rx:
+
+```swift
+UIDevice.rx.orientation
+  .filter { value in
+    return value != .landscape
+  }
+.map { _ in
+    return "Portrait is the best!"
+  }
+  .subscribe(onNext: { string in
+    showAlert(text: string)
+  })
+```
+
+Mỗi lần `UIDevice.rx.orientation` phát ra `.landscape` hay `.portrait`, các operator được áp dụng như sau:
+
+- `filter` operator chỉ lọc những value không phải `.landscape`. Nếu device đang ở landscape mode, các đoạn code phía sau sẽ không được chạy bởi `filter` lúc này chặn các event đó rồi.
+- Đặt trường hợp value là `.portrait`, `map` operator sẽ lấy input là kiểu Orientation rồi convert nó qua String "Portrait is the best!".
+- Với việc subcribe next event, lúc này, String value được show ra alert.
+
+__c. Scheduler__
+
+`Scheduler` trong Rx tương đương với dispatch queue - nhưng dễ xài hơn nhiều.
+
+RxSwift giới thiệu nhiều `Scheduler`, có thể cover 99% use case. Hi vọng là các chế sẽ không bao giờ có ý định sáng tạo thêm một cái `Scheduler` nào nữa.
+
+### III. App architecture
+
+RxSwift và MVVM chơi khá được với nhau. Lý do là bởi ViewModel cho phép expose `Observable<T>` property, cái mà bạn có thể bind trực tiếp đến UIKit control. Nó làm việc bingding data tới UI vô cùng đơn giản 
+
+![Image 7][Image 7]
+
+### IV. RxCocoa
+
+RxCocoa là thư viện đồng hành với RxSwift, nắm giữ tất cả các class hỗ trợ cho việc phát triển ứng dụng cùng UIKit và Cocoa. Bên cạnh việc tạo ra các class đặc biệt, RxCocoa thêm những reactive extension cho các UI component để bạn có thể subcribe các event từ nhiều UI khác nhau.
+
+Ví dụ với UISwitch:
+
+```swift
+toggleSwitch.rx.isOn
+  .subscribe(onNext: { enabled in
+    print( enabled ? "it's ON" : "it's OFF" )
+  })
+``` 
+
+Trong đó `rx` là reactive extension, `isOn` là property được RxCocoa thêm vào UISwitch để bạn có thể subcribe event sequence.
+
+![Image 8][Image 8]
+
+Ngoài ra, RxCocoa còn thêm `rx` vào `UITextField`, `URLSession`, `UIViewController`, v.v...
+
+### V. Installing RxSwift
+
+#### CocoaPods
+```bash
+use_frameworks!
+target 'MyTargetName' do
+  pod 'RxSwift', '~> 4.0'
+  pod 'RxCocoa', '~> 4.0'
+end
+```
+
+### VI. Community
+
+[http://community.rxswift.org](http://community.rxswift.org): Nhiều Rx project
+
+[https://github.com/RxSwiftCommunity](https://github.com/RxSwiftCommunity): Kinh nghiệm về thư viện Rx 
+
+[http://rxswift-slack.herokuapp.com](http://rxswift-slack.herokuapp.com): Cộng đồng Slack
+
+### VII. Where to go from here?
+
+Giờ hãy học cách tạo ra một Observable đơn giản, sử dụng MVVM nào.
+
+Đi đến [Chapter 2: Observables][Chapter 2]
+
 ## More
 
 Quay lại [RxSwiftDiary's Menu][Diary]
 
 ---
+[Chapter 2]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter2.md "Observables"
 
 [Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
 
