@@ -1,4 +1,4 @@
-## <img src="https://github.com/nmint8m/rxswiftdiary/blob/master/Image/img-rx.png" height ="30"> RxSwiftDiary
+## <img src="./Image/img-rx.png" height ="30"> RxSwiftDiary
 
 *Written by: __Nguyen Minh Tam__*
 
@@ -54,10 +54,10 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 
 ---
 
-[RxSwift Logo]: https://github.com/nmint8m/rxswiftdiary/blob/master/Image/img-rx.png=50x "RxSwift Logo"
+[RxSwift Logo]: ./Image/img-rx.png=50x "RxSwift Logo"
 
-[Chapter 1]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter1.md "Hello RxSwift"
-[Chapter 2]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter2.md "Observables"
-[Chapter 3]: https://github.com/nmint8m/rxswiftdiary/blob/master/Diary/Section1-Chapter3.md "Subjects"
+[Chapter 1]: ./Section1-Chapter1.md "Hello RxSwift"
+[Chapter 2]: ./Section1-Chapter2.md "Observables"
+[Chapter 3]: ./Section1-Chapter3.md "Subjects"
 
 [Reference 1]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"
