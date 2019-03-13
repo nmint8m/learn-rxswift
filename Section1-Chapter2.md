@@ -109,6 +109,150 @@ Tuy nhiên `from` operator lại tạo observable từ kiểu của từng phầ
 
 Lúc này console của playground khá là trống lúc nàt, vì chúng ta chưa print ra thứ gì cả. Chúng ta sẽ thay đổi điều này bằng cách subcribe observable.
 
+### Subscribing to observables
+
+Nếu bạn là một iOS developer, thì hẳn bạn khá quen thuộc với cách `NotificationCenter` hoạt động. Nó phát notification đến các observer, khác hẳng so với observable. Sau đây là ví dụ observer notification UIKeyboardDidChangeFrame, được handle bởi trailing closure:
+
+```swift
+let observer = NotificationCenter.default.addObserver(forName: .UIKeyboardDidChangeFrame, 
+	object: nil,
+	queue: nil) { notification in
+		// Handle receiving notification
+	}
+```
+
+Subcribe RxSwift observable cũng tương tự, thay vì gọi bằng `addObserver()` thì bạn gọi `subscribe()`. Một điểm khác biệt nữa, khi cần sử dụng `NotificationCenter` thì phải dùng singleton instance `.default` của nó, nhưng đối với Rx thì các observable tách biệt với nhau. Một điều khá quan trọng, một observable sẽ không send event cho tới khi nó có subcriber. 
+
+```swift
+observable2.subscribe { event in
+    print(event)
+}
+```
+
+Option-click vào `subcribe` operator, bạn sẽ thấy escaping closure có Event là kiểu Int và không trả về kết quả, `subcribe` operator trả vể kiểu `Disposable`. Chúng ta sẽ nhắc tới `Disposable` ở phần sau.
+
+<center>
+	<img src="./Image/Section1/c2-img6.png" height="200">
+</center>
+
+Kết quả của đoạn lệnh trên là in ra từng event được phát ra bởi observable.
+
+```
+next(1)
+next(2)
+next(3)
+completed
+```
+
+Observable phát `.next` event ứng với mỗi element, sau cùng phát `.completed` event rồi terminated. Để truy cập vào element của `.next` event, sử dụng đoạn code sau.
+
+```swift 
+observable2.subscribe { event in
+    print(event.element)
+}
+```
+
+Event sở hữu `element` property, nó là optional value, bởi chỉ có `.next` event mới có element. Vậy nên kết quả nhận được lúc này như sau.
+
+```
+Optional(1)
+Optional(2)
+Optional(3)
+nil
+```
+
+Cú pháp ngắn gọn phía trên rất hay được sử dụng trong RxSwift. Bên cạnh nó, còn có một `subcribe` operator khác xử lý từng loại event mà observable phát ra: `next`, `error` và `completed`.
+
+```swift
+observable2.subscribe(onNext: { element in
+    print(element)
+})
+```
+
+Kết quả thu được.
+
+```
+1
+2
+3
+```
+
+> Note: Tạm thời chúng ta sẽ bỏ qua cách handle những event còn lại rồi quay lại sau.
+
+Bây giờ bạn đang handle element của `.next` event và bỏ qua những thứ kia. Closure `onNext` lúc này nhận element trong `.next` event làm đối số của nó, vì thế cho nên bạn không cần phải unwrap optional mới lấy được giá trị của element.
+
+Bạn đã hiểu được cách tạo ra một observable có một hoặc nhiều element. Nhưng điều gì xảy ra khi observable không có element nào? Lúc này `empty` operactor giúp tạo ra một empty observable sequence không có element nào cả, nó chỉ phát ra duy nhất một event `.completed` rồi terminated.
+
+```swift
+let observable5 = Observable<Void>.empty()
+observable5.subscribe{ event in
+    print(event)
+}
+```
+
+Kết quả thu được.
+
+```
+completed
+```
+
+Observable phải được khai báo kiểu xác định trong trường hợp nó không tự suy được. Vậy đối với trường hợp empty như thế này thì không thể tự suy ra kiểu được, nên ta sẽ khai báo kiểu Void.
+
+```swift
+observable5.subscribe(
+    onNext: { element in
+        print(element)
+    }, onCompleted: {
+        print("Completed")
+    })
+```
+
+Đoạn code này có kết quả giống với đoạn trước đó vì observable chỉ phát ra duy nhất `.completed` event.
+
+Vấn đề là sử dụng empty observable làm gì giờ? Câu trả lời là khi bạn cần một observable có thể terminate ngay lập tức hoặc cố ý không phát ra element nào.
+
+Trái với `empty` operator, `never` operator tạo ra một observable không bao giờ phát ra bất kỳ thứ gì và cũng không bao giờ terminate. Nó có thể được sử dụng để biểu diễn infinite duration.
+
+```swift
+let observable6 = Observable<Any>.never()
+observable6.subscribe(
+    onNext: { element in
+        print(element)
+    }, onCompleted: {
+    print("Completed")
+    })
+```
+
+Chả có gì được in ra thậm chí là "Completed".
+
+Mở rộng thêm một chút nữa, ta có thể tạo ra một observable từ một dãy các giá trị bằng cách sử dụng `range` operator.
+
+```swift
+let observable7 = Observable<Int>.range(start: 0, count: 9)
+observable7.subscribe(
+    onNext: { element in
+        print(element)
+    }, onCompleted: {
+    print("Completed")
+    })
+```
+
+Kết quả thu được.
+
+```
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Completed
+```
+
 ## More
 
 Quay lại chapter trước [Chapter 1: Hello RxSwift][Chapter 1]
