@@ -1,4 +1,4 @@
-## <img src="./Image/img-rx.png" height ="30"> RxSwiftDiary
+## <img src="./Document/Image/img-rx.png" height ="30"> RxSwiftDiary
 
 *Written by: __Nguyen Minh Tam__*
 
@@ -54,7 +54,7 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 
 ---
 
-[RxSwift Logo]: ./Image/img-rx.png=50x "RxSwift Logo"
+[RxSwift Logo]: ./Document/Image/img-rx.png=50x "RxSwift Logo"
 
 [Chapter 1]: ./Section1-Chapter1.md "Hello RxSwift"
 [Chapter 2]: ./Section1-Chapter2.md "Observables"
