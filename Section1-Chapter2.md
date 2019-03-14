@@ -1,5 +1,7 @@
 *Written by: __Nguyen Minh Tam__*
 
+*Written by: **Nguyen Minh Tam***
+
 # <img src="./Image/img-rx.png" height ="30"> Section 1: Getting started with RxSwift
 
 ## <img src="./Image/img-rx.png" height ="25"> Chapter 2: Observables
@@ -85,10 +87,10 @@ let observable2 = Observable.of(one, two, three)
 ```
 
 Đoạn trên có nghĩa:
-- Khai báo vài integer constant
-- Khởi tạo một observable sequence có kiểu Int với duy nhất một element integer `one`
-- Khởi tạo một observable sequence với duy nhất một element integer `one`
-- Khởi tạo một observable sequence với nhiều element: `one`, `two`, `three`
+- Khai báo vài integer constant.
+- Khởi tạo một observable sequence có kiểu Int với duy nhất một element integer `one`.
+- Khởi tạo một observable sequence với duy nhất một element integer `one`.
+- Khởi tạo một observable sequence với nhiều element: `one`, `two`, `three`.
 
 Method như `just` là type method của kiểu Observable. Tuy nhiên trong Rx, lưu ý là các method đều được gọi là `operator`. Ví dụ số 2 không khai báo kiểu cụ thể, tuy nhiên nó không phải là một array, nó là kiểu `Observable<Int>`. Vậy nên nếu bạn muốn tạo một observable sequence với nhiều element, chỉ cần pass một array vào `of`.
 
@@ -105,9 +107,9 @@ Một operator khác được sử dụng để tạo observable là `from`.
 let observable4 = Observable.from([one, two, three])
 ```
 
-Tuy nhiên `from` operator lại tạo observable từ kiểu của từng phần tử của array. Option-click vào `observable4` bạn sẽ thấy nó thuộc kiểu `Observable<Int>` thay vì `[Int]`
+Tuy nhiên `from` operator lại tạo observable từ kiểu của từng phần tử của array. Option-click vào `observable4` bạn sẽ thấy nó thuộc kiểu `Observable<Int>` thay vì `[Int]`.
 
-Lúc này console của playground khá là trống lúc nàt, vì chúng ta chưa print ra thứ gì cả. Chúng ta sẽ thay đổi điều này bằng cách subcribe observable.
+Lúc này console của playground khá là trống lúc nàt, vì chúng ta chưa print ra thứ gì cả. Chúng ta sẽ thay đổi điều này bằng cách subscribe observable.
 
 ### Subscribing to observables
 
@@ -121,7 +123,7 @@ let observer = NotificationCenter.default.addObserver(forName: .UIKeyboardDidCha
 	}
 ```
 
-Subcribe RxSwift observable cũng tương tự, thay vì gọi bằng `addObserver()` thì bạn gọi `subscribe()`. Một điểm khác biệt nữa, khi cần sử dụng `NotificationCenter` thì phải dùng singleton instance `.default` của nó, nhưng đối với Rx thì các observable tách biệt với nhau. Một điều khá quan trọng, một observable sẽ không send event cho tới khi nó có subcriber. 
+subscribe RxSwift observable cũng tương tự, thay vì gọi bằng `addObserver()` thì bạn gọi `subscribe()`. Một điểm khác biệt nữa, khi cần sử dụng `NotificationCenter` thì phải dùng singleton instance `.default` của nó, nhưng đối với Rx thì các observable tách biệt với nhau. Một điều khá quan trọng, một observable sẽ không send event cho tới khi nó có subscriber. 
 
 ```swift
 observable2.subscribe { event in
@@ -129,7 +131,7 @@ observable2.subscribe { event in
 }
 ```
 
-Option-click vào `subcribe` operator, bạn sẽ thấy escaping closure có Event là kiểu Int và không trả về kết quả, `subcribe` operator trả vể kiểu `Disposable`. Chúng ta sẽ nhắc tới `Disposable` ở phần sau.
+Option-click vào `subscribe` operator, bạn sẽ thấy escaping closure có Event là kiểu Int và không trả về kết quả, `subscribe` operator trả vể kiểu `Disposable`. Chúng ta sẽ nhắc tới `Disposable` ở phần sau.
 
 <center>
 	<img src="./Image/Section1/c2-img6.png" height="200">
@@ -161,7 +163,7 @@ Optional(3)
 nil
 ```
 
-Cú pháp ngắn gọn phía trên rất hay được sử dụng trong RxSwift. Bên cạnh nó, còn có một `subcribe` operator khác xử lý từng loại event mà observable phát ra: `next`, `error` và `completed`.
+Cú pháp ngắn gọn phía trên rất hay được sử dụng trong RxSwift. Bên cạnh nó, còn có một `subscribe` operator khác xử lý từng loại event mà observable phát ra: `next`, `error` và `completed`.
 
 ```swift
 observable2.subscribe(onNext: { element in
@@ -199,12 +201,11 @@ completed
 Observable phải được khai báo kiểu xác định trong trường hợp nó không tự suy được. Vậy đối với trường hợp empty như thế này thì không thể tự suy ra kiểu được, nên ta sẽ khai báo kiểu Void.
 
 ```swift
-observable5.subscribe(
-    onNext: { element in
-        print(element)
-    }, onCompleted: {
-        print("Completed")
-    })
+observable5.subscribe(onNext: { element in
+    print(element)
+}, onCompleted: {
+    print("Completed")
+})
 ```
 
 Đoạn code này có kết quả giống với đoạn trước đó vì observable chỉ phát ra duy nhất `.completed` event.
@@ -215,12 +216,11 @@ Trái với `empty` operator, `never` operator tạo ra một observable không 
 
 ```swift
 let observable6 = Observable<Any>.never()
-observable6.subscribe(
-    onNext: { element in
-        print(element)
-    }, onCompleted: {
+observable6.subscribe(onNext: { element in
+    print(element)
+}, onCompleted: {
     print("Completed")
-    })
+})
 ```
 
 Chả có gì được in ra thậm chí là "Completed".
@@ -229,12 +229,11 @@ Mở rộng thêm một chút nữa, ta có thể tạo ra một observable từ
 
 ```swift
 let observable7 = Observable<Int>.range(start: 0, count: 9)
-observable7.subscribe(
-    onNext: { element in
-        print(element)
-    }, onCompleted: {
+observable7.subscribe(onNext: { element in
+    print(element)
+}, onCompleted: {
     print("Completed")
-    })
+})
 ```
 
 Kết quả thu được.
@@ -252,6 +251,143 @@ Kết quả thu được.
 9
 Completed
 ```
+
+###Disposing and terminating
+
+Lưu ý một observable sẽ không làm gì chỉ cho đến khi nó được subscribe. subscription sẽ trigger observable, sau đó observable bắt đầu phát event, đến khi nó phát event `.error` hoặc `. completed` và terminated. Bạn có thể tự điều chỉnh terminate observable bằng việc cancel subscription đến observable đó.
+
+```swift
+let observable8 = Observable.of("A", "B", "C")
+let subscription8 = observable8.subscribe { event in
+    print(event)
+}
+subscription8.dispose()
+```
+
+Đoạn code trên khá đơn giản:
+- Tạo một observable phát ra một số string.
+- subscribe observable, như đã đề cập ở phần `Subscribing to observables` phía trên, kết quả của `subscribe` operator trả về kiểu `Disposable`.
+- In mỗi event được phát ra.
+- Để cancel một subscription, gọi `dispose()`. Sau khi bạn cancel subsciption, hay còn gọi là dispose nó, observable sẽ dừng việc phát ra event.
+
+Việc quản lý mỗi subscription sẽ rấy là chán, bởi bậy RxSwift giới thiệu kiểu `DisposeBag`. Một dispose bag giữ nhiều disposable, được thêm vào bởi method `.disposed(by:)` và nó sẽ gọi `dispose()` cho mỗi disposable khi dispose bag sắp được giải phóng.
+
+```swift
+let disposeBag = DisposeBag()
+Observable.of("A", "B", "C").subscribe {
+    print($0)
+}.disposed(by: disposeBag)
+```
+
+Đây là cách đoạn code trên hoạt động:
+
+- Tạo ra một dispose bag.
+- Tạo ra một observable.
+- subscribe observable và in mỗi event được phát ra.
+- Cuối cùng là thêm giá trị disposable mới được tạo ra vào dispose bag.
+
+Pattern này bạn sẽ sử dụng rất là nhiều khi làm việc với Rx: khi tạo và subscribing một observable và ngay lập tức add subscription vào dispose bag.
+
+__Lưu ý__: Nếu bạn quên thêm subscription vào dispose bag hoặc không tự gọi `dispose()` khi kết thúc subscribe hoặc trong một số trường hợp observable bị terminated, sẽ dẫn đến `leak memory`. Cũng đừng lo lắng quá, Swift compiler sẽ cảnh báo bạn các case trên.
+
+In the previous examples, you’ve created observables with specific .next event elements. Another way to specify all events that an observable will emit to subscribers is by using the create operator.
+
+Ở ví dụ phía trên, bạn đã tạo ra được observable với `.next` event xác định với operator `of`. Một cách khác định nghĩa tất cả các event mà một observable sẽ phát ra là bằng cách sử dụng `create` operator.
+
+```swift
+Observable<String>.create{ observer in
+    observer.onNext("0")
+    observer.onCompleted()
+    observer.onNext("?")
+    return Disposables.create()
+}
+```
+
+`create` operator chỉ có duy nhất một parameter `subscribe`. Công việc của nó là chỗ để định nghĩa tất cả các event sẽ được phát tới subscriber. Option-click lên `create` operator bạn sẽ thất rằng `subscribe` parameter là một escaping closure lấy các giá trị `AnyObserver` làm đầu vào và trả về `Disposable`.
+
+<center>
+	<img src="./Image/Section1/c2-img7.png" height="200">
+</center>
+
+Lưu ý ở bước cuối cùng, escaping closure trả về `Disposable` khá là kỳ cục phải không. Nhưng mà lướt lên phía trên đi, các `subscribe` operator đều trả về `Disposable` mà. 
+
+Ở đây `Disposables.create()` có tác dụng khác nữa. Bạn có thể dễ dàng đoán được event `.onNext("?")` sẽ không được phát ra phải không? Hãy cùng check lại suy đoán của các bạn nhé, bằng cách `subscribe` observable trên và implement closure của `subcribe` như sau.
+
+```swift
+let disposeBag = DisposeBag()
+Observable<String>.create{ observer in
+    observer.onNext("0")
+    observer.onCompleted()
+    observer.onNext("?")
+    return Disposables.create()
+}.subscribe(
+    onNext: { print($0) },
+    onCompleted: { print("Completed") },
+    onDisposed: { print("Disposed") }
+).disposed(by: disposeBag)
+```
+
+Well well, kết quả thu được.
+
+```
+0
+Completed
+Disposed
+```
+
+Điều gì xảy ra khi bạn thêm error vào observer đây? Và xảy ra như thế nào nếu phát `.error` event trước `.completed` event đây? Trước hết ta hãy tạo ra một kiểu Error với một case someError rồi kiểm chứng sau.
+
+```swift
+enum MyError: Error {
+    case someError
+}
+let disposeBag = DisposeBag()
+Observable<String>.create{ observer in
+    observer.onNext("0")
+    observer.onError(MyError.someError)
+    observer.onCompleted()
+    observer.onNext("?")
+    return Disposables.create()
+}.subscribe(
+    onNext: { print($0) },
+    onError: { print($0) },
+    onCompleted: { print("Completed") },
+    onDisposed: { print("Disposed") }
+).disposed(by: disposeBag)
+```
+
+Kết quả thu được là observable phát ra error sau đó thì terminated luôn.
+
+```
+0
+someError
+Disposed
+```
+
+Lại kiểm chứng một trường hợp khác, không phát `.error` event lẫn `.completed` event thì kết quả sẽ như thế nào?
+
+```swift
+let disposeBag = DisposeBag()
+Observable<String>.create{ observer in
+    observer.onNext("0")
+    observer.onNext("?")
+    return Disposables.create()
+    }.subscribe(
+        onNext: { print($0) },
+        onError: { print($0) },
+        onCompleted: { print("Completed") },
+        onDisposed: { print("Disposed") }
+    ).disposed(by: disposeBag)
+```
+
+Kết quả là.
+
+```
+0
+?
+```
+
+🎉 Bạn có biết rằng bạn vừa `leak memory` không? Observable lúc này sẽ không bao giờ kết thúc, và disposable lúc này sẽ không bao giờ được dispose. Vậy nên nhớ thêm `observer.onCompleted()` sau `observer.onNext("?")` nhé.
 
 ## More
 
