@@ -1,6 +1,6 @@
 *Written by: __Nguyen Minh Tam__*
 
-# <img src="./Image/img-rx.png" height ="30"> Section 1: Getting started with RxSwift
+# <img src="./Document/Image/img-rx.png" height ="30"> Section 1: Getting started with RxSwift
 
 Mục tiêu:
 
@@ -8,7 +8,7 @@ Mục tiêu:
 - Solution.
 - Các class cơ bản trong foundation của Rx framework.
 
-## <img src="./Image/img-rx.png" height ="25"> Chapter 1: Hello RxSwift
+## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 1: Hello RxSwift
 
 RxSwift là gì?
 
@@ -48,7 +48,7 @@ Bởi vì hầu hết các class và UI component đều hoạt động bất đ
 Dù sao đi nữa thì những API liệt kê ở trên đều vô cùng xuất sắc, đáp ứng được các task chuyên biệt, và nói cho công bằng rằng nó khá là mạnh moẽ so với offer của những platform khác. Cái vấn đề ờ đây là việc code bất đồng bộ sẽ trở nên khó khăn vì Apple cung cấp nhiều API, mà lại không có universal language nào có thể liên kết các API bất đồng bộ này. Vậy nên khá là chắc kèo rằng việc đọc và viết code sẽ khó mà triển được.
 
 <center>
-	<img src="./Image/Section1/c1-img1.png" height="300">
+	<img src="./Document/Image/Section1/c1-img1.png" height="300">
 </center>
 
 Trước khi kết thúc section này và cho ví dụ về ngữ cảnh để dễ hiểu hơn, chúng ta thử so sánh 2 đoạn code sau: `synchronous` và `asynchronous`. 
@@ -188,13 +188,13 @@ Protocol `ObservableType` (protocol mà `Observable<T>` conform) trông quá chy
 Khi nói về những event bất đồng bộ được phát ra, chúng ta có thể mô tả trực quan chúng trên một timeline. Ví dụ timeline của một `Observable<Int>`:
 
 <center>
-	<img src="./Image/Section1/c1-img2.png" height="200">
+	<img src="./Document/Image/Section1/c1-img2.png" height="200">
 </center>
 
 Nói chung lại là `Observable` có thể phát bất cứ thứ gì trong Rx. Vì nó universal như thế nên chúng ta có thể tạo ra app logic phức tạp nhường nào cũng cân được. Bởi vì không có giả thuyết nào được đặt ra cho môi trường của `Observable` hoặc `Observer`, vậy nên việc sử dụng event sequence lúc này hoàn toàn linh hoạt. Bây giờ bạn chả cần phải xài delegate protocol hay là closure để các class giao tiếp với nhau.
 
 <center>
-	<img src="./Image/Section1/c1-img3.png" height="300">
+	<img src="./Document/Image/Section1/c1-img3.png" height="300">
 </center>
 
 Để thêm vài cái nhìn sinh động cho các trường hợp trong real life, hãy xem xét hai loại observable sequence sau: finite và infinite.
@@ -231,7 +231,7 @@ __b. Infinite observable sequences__
 Không giống như tác vụ download hay những task tương tự, kiểu mà sẽ kết thúc theo cách tự nhiên hay bắt buộc, còn một loại tác vụ khác không bao giờ kết thúc.
 
 <center>
-	<img src="./Image/Section1/c1-img4.png" height="300">
+	<img src="./Document/Image/Section1/c1-img4.png" height="300">
 </center>
 
 Giống như đối với việc user không bao giờ xoay device, nhưng nó đâu có nghĩa là chuỗi event đấy kết đã kết thúc. Nó chỉ có nghĩa là không có bất cứ event nào được phát ra. Trong RxSwift, bạn có thể viết code như này để handle xoay device:
@@ -251,7 +251,7 @@ UIDevice.rx.orientation
 `UIDevice.rx.orientation` ở đây là một control property tưởng tượng thôi ợ, mục đích tạo ra `Observable<Orientation>`. Mình subscribe nó và update UI theo orientation hiện tại. Mình sẽ skip `onError` và `onCompleted` parameter, bởi những event này không bao giờ được phát ra bởi observable này.
 
 <center>
-	<img src="./Image/Section1/c1-img5.png" height="400">
+	<img src="./Document/Image/Section1/c1-img5.png" height="400">
 </center>
 
 __Operators__
@@ -296,7 +296,7 @@ RxSwift giới thiệu nhiều `Scheduler`, có thể cover 99% use case. Hi v�
 RxSwift và MVVM chơi khá được với nhau. Lý do là bởi ViewModel cho phép expose `Observable<T>` property, cái mà bạn có thể bind trực tiếp đến UIKit control. Nó làm việc bingding data tới UI vô cùng đơn giản 
 
 <center>
-	<img src="./Image/Section1/c1-img7.png" height="250">
+	<img src="./Document/Image/Section1/c1-img7.png" height="250">
 </center>
 
 ### IV. RxCocoa
@@ -315,7 +315,7 @@ toggleSwitch.rx.isOn
 Trong đó `rx` là reactive extension, `isOn` là property được RxCocoa thêm vào UISwitch để bạn có thể subcribe event sequence.
 
 <center>
-	<img src="./Image/Section1/c1-img8.png" height="150">
+	<img src="./Document/Image/Section1/c1-img8.png" height="150">
 </center>
 
 Ngoài ra, RxCocoa còn thêm `rx` vào `UITextField`, `URLSession`, `UIViewController`, v.v...
