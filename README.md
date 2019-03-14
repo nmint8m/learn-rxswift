@@ -9,7 +9,7 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 ### Section I: Getting started with RxSwift
 
 - [Chapter 1: Hello RxSwift][Chapter 1]
-- [Chapter 2: Observables][Chapter 2] `[/WIP]`
+- [Chapter 2: Observables][Chapter 2]
 - [Chapter 3: Subjects][Chapter 3] `[/WIP]`
 - [Chapter 4: Observables and Subjects in practice]() `[/WIP]`
 

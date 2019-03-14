@@ -20,7 +20,24 @@ Nói theo cách dễ hiểu hơn:
 > 
 > Hiểu nôm na là: RxSwift giúp đơn giản hoá quá trình phát triển ứng dụng bất đồng bộ bằng cách cho phép code của bạn tương tác với data và xử lý chúng theo một cách tuần tự và độc lập.
 
-### I. Introduction to asynchronous programming
+__Menu__
+
+- [Introduction to asynchronous programming](#introduction-to-asynchronous-programming)
+	- [Cocoa and UIKit Asynchronous APIs](#cocoa-and-uikit-asynchronous-apis)
+		- [Synchronous code](#synchronous-code)
+		- [Asynchronous code](#asynchronous-code)
+	- [Asynchronous programming glossary](#asynchronous-programming-glossary)
+- [Foundation of RxSwift](#foundation-of-rxswift)
+	- [Observables](#observables)
+	- [Operators](#operators)
+	- [Schedulers](#schedulers)
+- [App architecture](#app-architecture)
+- [RxCocoa](#rxcocoa)
+- [Installing RxSwift](#installing-rxswift)
+- [Community](#community)
+- [Where to go from here](#where-to-go-from-here)
+
+### Introduction to asynchronous programming
 
 Trong app iOS, tại bất cứ thời điểm nào đều xử lý những tác vụ sau:
 
@@ -34,7 +51,7 @@ Tất cả những tác vụ này đều có thể cùng diễn ra một lúc. V
 
 Rất phức tạp để có thể viết code chạy song song, đặc biệt là những tác vụ cần làm việc trên cùng một data. Rất khó để tranh luận rằng đoạn code nào sẽ update data trước và đoạn nào đọc kết quả sau cùng.
 
-#### 1. Cocoa and UIKit Asynchronous APIs
+#### Cocoa and UIKit Asynchronous APIs
 
 Apple giúp chúng ta viết asynchronous code bằng các API sau:
 
@@ -53,7 +70,7 @@ Dù sao đi nữa thì những API liệt kê ở trên đều vô cùng xuất 
 
 Trước khi kết thúc section này và cho ví dụ về ngữ cảnh để dễ hiểu hơn, chúng ta thử so sánh 2 đoạn code sau: `synchronous` và `asynchronous`. 
 
-##### a. Synchronous code
+##### Synchronous code
 
 Đoạn code kinh điển mà ai cũng sẽ trải qua một lần trong đời: print mỗi element trong một array. Ví dụ sau đảm bảo được 2 tiêu chí:
 
@@ -78,7 +95,7 @@ Kết quả như sau:
 [4, 5, 6]
 ```
 
-##### b. Asynchronous code
+##### Asynchronous code
 
 Cũng một đoạn code như thế, nhưng giả sử mỗi vòng lặp là một reaction cho một cái tap trên button. Khi user liên tục tap lên button, app sẽ liên tục print ra element tiếp theo. Nhớ là đặt đoạn code này trong ngữ cảnh được đề cập bên trên nhé.
 
@@ -100,7 +117,7 @@ Tới đây ta có thể nhận ra được vấn đề cốt lõi khi viết co
 
 May mắn thay, dăm ba cái vấn đề này, RxSwift xử lý bá lắm rồi.
 
-#### 2. Asynchronous programming glossary
+#### Asynchronous programming glossary
 
 RxSwift nhằm giải quyết những issue sau:
 
@@ -169,11 +186,11 @@ __Reactive systems__
 - Elastic: Code handle nhiều công việc
 - Message driven: Các component sử dụng message-based communication để nâng cao tính reusability và tính độc lập, tách rời khỏi lifecycle và sự implementation của các class.
 
-### II. Foundation of RxSwift
+### Foundation of RxSwift
 
 Rx code sử dụng 3 building block chính sau: observables, operators và schedulers.
 
-#### 1. Observables
+#### Observables
 
 Class `Observable<T>` cho phép phần foundation của Rx code khả năng cung cấp một chuỗi các event một cách bất đồng bộ, mà chuỗi event này có thể nắm giữ một immutable snapshot của data T. Nói theo cách đơn giản, nó cho phép class subcribe value được phát ra (emitted) bởi một class khác bất kể khi nào.
 
@@ -254,7 +271,7 @@ UIDevice.rx.orientation
 	<img src="./Document/Image/Section1/c1-img5.png" height="400">
 </center>
 
-__Operators__
+#### Operators
 
 `ObservableType` và cách implementation của class `Observable` bao gồm rất nhiều method trừu tượng hoá các phần khác nhau của một công việc bất đồng bộ, có thể dễ quản lý khi cần implement logic phức tạp hơn.
 
@@ -285,13 +302,13 @@ Mỗi lần `UIDevice.rx.orientation` phát ra `.landscape` hay `.portrait`, cá
 - Đặt trường hợp value là `.portrait`, `map` operator sẽ lấy input là kiểu Orientation rồi convert nó qua String "Portrait is the best!".
 - Với việc subcribe next event, lúc này, String value được show ra alert.
 
-__c. Scheduler__
+#### Scheduler
 
 `Scheduler` trong Rx tương đương với dispatch queue - nhưng dễ xài hơn nhiều.
 
 RxSwift giới thiệu nhiều `Scheduler`, có thể cover 99% use case. Hi vọng là các chế sẽ không bao giờ có ý định sáng tạo thêm một cái `Scheduler` nào nữa.
 
-### III. App architecture
+### App architecture
 
 RxSwift và MVVM chơi khá được với nhau. Lý do là bởi ViewModel cho phép expose `Observable<T>` property, cái mà bạn có thể bind trực tiếp đến UIKit control. Nó làm việc bingding data tới UI vô cùng đơn giản 
 
@@ -299,7 +316,7 @@ RxSwift và MVVM chơi khá được với nhau. Lý do là bởi ViewModel cho 
 	<img src="./Document/Image/Section1/c1-img7.png" height="250">
 </center>
 
-### IV. RxCocoa
+### RxCocoa
 
 RxCocoa là thư viện đồng hành với RxSwift, nắm giữ tất cả các class hỗ trợ cho việc phát triển ứng dụng cùng UIKit và Cocoa. Bên cạnh việc tạo ra các class đặc biệt, RxCocoa thêm những reactive extension cho các UI component để bạn có thể subcribe các event từ nhiều UI khác nhau.
 
@@ -320,9 +337,9 @@ Trong đó `rx` là reactive extension, `isOn` là property được RxCocoa th�
 
 Ngoài ra, RxCocoa còn thêm `rx` vào `UITextField`, `URLSession`, `UIViewController`, v.v...
 
-### V. Installing RxSwift
+### Installing RxSwift
 
-#### CocoaPods
+CocoaPods
 ```bash
 use_frameworks!
 target 'MyTargetName' do
@@ -331,7 +348,7 @@ target 'MyTargetName' do
 end
 ```
 
-### VI. Community
+### Community
 
 [http://community.rxswift.org](http://community.rxswift.org): Nhiều Rx project
 
@@ -339,7 +356,7 @@ end
 
 [http://rxswift-slack.herokuapp.com](http://rxswift-slack.herokuapp.com): Cộng đồng Slack
 
-### VII. Where to go from here?
+### Where to go from here
 
 Giờ hãy học cách tạo ra một Observable đơn giản, sử dụng MVVM nào.
 
