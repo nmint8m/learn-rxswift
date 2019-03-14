@@ -302,7 +302,7 @@ Mỗi lần `UIDevice.rx.orientation` phát ra `.landscape` hay `.portrait`, cá
 - Đặt trường hợp value là `.portrait`, `map` operator sẽ lấy input là kiểu Orientation rồi convert nó qua String "Portrait is the best!".
 - Với việc subcribe next event, lúc này, String value được show ra alert.
 
-#### Scheduler
+#### Schedulers
 
 `Scheduler` trong Rx tương đương với dispatch queue - nhưng dễ xài hơn nhiều.
 
