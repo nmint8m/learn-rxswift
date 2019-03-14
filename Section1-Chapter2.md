@@ -4,11 +4,22 @@
 
 ## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 2: Observables
 
+__Menu__
+- [Getting started](#getting-started)
+- [What is an observable](#what-is-an-observable)
+- [Lifecycle of an observable](#lifecycle-of-an-observable)
+- [Creating observables](#creating-observables)
+- [Subscribing to observables](#subscribing-to-observables)
+- [Creating observable factories](#creating-observable-factories)
+- [Using Traits](#using-traits)
+
 Trong chapter này, bạn sẽ lướt qua nhiều ví dụ tạo và subcribing observable. Mặc dù observable sử dụng trong real world nhiều trường hợp khá là chuối, cơ mà những phần còn lại sẽ giúp chúng ta đạt được những skill quan trọng và biết được kha khá các loại observable khác nhau.
 
 Trước khi đi vào tìm hiểu sâu hơn, đầu tiên chúng ta cùng tìm hiểu `Observable` là gì đã.
 
 ### Getting started
+
+Bắt đầu với `RxSwiftPlayground.xcworkspace` project trong thư mục `./Document/ExampleProject/02-observable-pg/starter/` sau khi chạy `pod install` đã giới thiệu ở [Chapter 1][Chapter 1].
 
 ### What is an observable
 
@@ -251,7 +262,7 @@ Kết quả thu được.
 Completed
 ```
 
-###Disposing and terminating
+### Disposing and terminating
 
 Lưu ý một observable sẽ không làm gì chỉ cho đến khi nó được subscribe. subscription sẽ trigger observable, sau đó observable bắt đầu phát event, đến khi nó phát event `.error` hoặc `. completed` và terminated. Bạn có thể tự điều chỉnh terminate observable bằng việc cancel subscription đến observable đó.
 
