@@ -3,3 +3,167 @@
 # <img src="./Document/Image/img-rx.png" height ="30"> Section 1: Getting started with RxSwift
 
 ## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 3: Subjects
+
+Ở phần trước, chúng ta đã biết được observable là gì, cách tạo ra, subscibe nó như thế nào và dispose nó ra sao. Observable là một thành phần cơ bản của RxSwift, tuy nhiên cái mà chúng ta thực sự cần khi develop app là tạo new value và add nó vào observable lúc run time, và những value này được phát tới các subscriber. Cái mà chúng ta thực sự cần là một thứ vừa có thể hành động như một observable (phát) và như một observer (thu). Thành phần đó được gọi là `Subject`.
+
+Trong phần này chúng ta sẽ tìm hiểu các loại subject khác nhau trong RxSwift, cách hoạt động của nó như thế nào, và tại sao chúng ta sẽ chọn loại subject nhất định dựa vào use case được áp dụng.
+
+__Menu__
+
+- [Getting started](#getting-started)
+- [What are subjects?](#what-are-subjects)
+- [Working with publish subjects](#working-with-publish-subjects)
+- [Working with behavior subjects](#working-with-behavior-subjects)
+- [Working with replay subjects](#working-with-replay-subjects)
+- [Working with variables](#working-with-variables)
+
+### Getting started
+
+Sau khi chạy `pod install`, mở `RxSwiftPlayground.xcworkspace` project trong thư mục `./Document/ExampleProject/03-subjects-and-variable/starter/`.
+
+Đây là cách tạo một `PublishSubject`.
+
+```swift
+let subject = PublishSubject<String>()
+```
+
+Giống như nhà xuất bản báo (newspaper publisher), nó sẽ nhận thông tin, và quay ngược lại publish cho các subscriber. Publish subject phía trên có kiểu `String`, cho nên nó chỉ nhận kiểu `String` và publish kiểu `String`. Sau khi được initial, nó bắt đầu có thể nhận thông tin.
+
+```swift
+subject.onNext("Is anyone listening?")
+```
+
+Đoạn này, một string được đưa vào subject, nhưng chưa có bất kỳ thông tin nào được in ra vì chưa có observer. Dòng code sau sẽ giúp tạo một subscription của `subject`, nó sẽ in ra element mỗi khi nhận được `.next` event.
+
+```swift
+let subscriptionOne = subject.subscribe(onNext: { print($0) })
+```
+
+Nhưng console lúc này vẫn trống, vì sao vậy? Bởi vì `PublishSubject` chỉ phát event đến cho những subscriber hiện tại đang subscibe nó. Vậy nên nếu chúng ra không thể observer được những thông tin đã được phát trong quá khứ tính từ thời điểm bắt đầu subscribe.
+
+Vấn đề được xử lý khi thêm đoạn code sau.
+
+```swift
+subject.onNext("1")
+```
+
+> __Lưu ý:__ Câu lệnh `subject.onNext("1")` tương đương với `subject.on(.next("1"))`. Cách đầu dễ đọc hơn cách thứ hai.
+
+Kết quả thu được.
+
+```
+1
+```
+
+Chúng ta vừa mới đi qua một khởi đầu nhẹ nhàng, ở phần dưới chúng ta sẽ tìm hiểu sâu hơn về subject.
+
+### What are subjects?
+
+Subject hoạt động vừa là observable, vừa là observer. Ta đã thấy cách mà nó nhận event và được subscribe tới ở phía trên.
+
+- Subject nhận vào `.next` event -> Subject là observer
+- Mỗi khi subject nhận một event thì nó sẽ quay ngược lại và phát event cho các subscriber của nó. -> Subject là observable
+
+Có bốn loại subject trong RxSwift:
+
+- `PublishSubject`: Bắt đầu với giá trị rỗng và chỉ phát new value khi đến subsciber.
+- `BehaviorSubject`: Bắt đầu với một giá trị khởi tạo, sau đó lặp lại nó hoặc lặp lại element mới nhất đến subscriber mới.
+- `ReplaySubject`: Được khởi tạo với một buffer size nhất định và duy trì số lượng element được replay tới subscriber tương ứng với buffer size đó.
+- `Variable`: Nó giống như một `BehaviorSubject`, giữ các giá trị hiện tại thành `state`, và chỉ phát lại duy nhất giá trị mới nhất hoặc giá trị khởi tạo cho những subscriber mới.
+
+### Working with publish subjects
+
+`PublishSubject` được sử dụng khi subscriber sẽ được notify chỉ bởi những event được phát kể từ thời điểm nó đăng ký subscribe observable trở đi, cho đến khi nào chúng unsubscribe hoặc là subject đó bị terminate bởi event `.completed` hoặc `.error`.
+
+<center>
+	<img src="./Image/c3-img1.png" height="200">
+</center>
+
+Vì subscription thứ hai subscribe sau khi `1` được phát, vậy nên nó sẽ không nhận được event `1`, mà chỉ nhận được event `2` và `3`. Tương tự, subscription thứ ba chỉ nhận được event `3`.
+
+Đoạn code sau mô tả model phía trên:
+
+```swift
+let subject = PublishSubject<String>()
+subject.onNext("Is anyone listening?")
+let subscriptionOne = subject.subscribe(onNext: { print("Subcriber 1: \($0)") })
+subject.onNext("1")
+let subscriptionTwo = subject.subscribe(onNext: { print("Subcriber 2: \($0)") })
+subject.onNext("2")
+let subscriptionThree = subject.subscribe(onNext: { print("Subcriber 3: \($0)") })
+subject.onNext("3")
+```
+
+Kết quả thu được.
+
+```
+Subcriber 1: 1
+Subcriber 1: 2
+Subcriber 2: 2
+Subcriber 1: 3
+Subcriber 2: 3
+Subcriber 3: 3
+```
+
+Bạn dễ dàng thấy được `3` được in ra 3 lần vì nó được phát ra sau khi `subscriptionOne`, `subscriptionTwo` và `subscriptionThree` đăng ký subscribe `subject`.
+
+Nếu tiếp tục thêm đoạn code sau vào dưới đoạn code viết ở trên:
+
+```swift
+subscriptionOne.dispose()
+subject.onNext("4")
+```
+
+Lúc này `4` chỉ được in ra 2 lần bởi `subscriptionTwo` và `subscriptionThree`, bởi `subscriptionOne` đã bị `dispose` từ lúc nãy.
+
+```
+Subcriber 2: 4
+Subcriber 3: 4
+```
+
+Khi public subject nhận `.completed` hoặc `.error` event (stop event), nó sẽ phát những stop event này cho các subscriber và nó sẽ không tiếp tục phát `.next` event nữa. 
+
+Thử đoạn code sau:
+
+```swift
+let disposeBag = DisposeBag()
+let subject = PublishSubject<String>()
+subject.subscribe(onNext: { print($0) },
+                  onCompleted: { print("onCompleted") },
+                  onDisposed: { print("onDisposed") })
+    .disposed(by: disposeBag)
+subject.onCompleted()
+```
+
+Đây là những gì chúng ta làm:
+
+- Khởi tạo một dispose bag và một subject.
+- Subscribe subject, nó sẽ in ra element nếu nhận `.next` event, in ra `onCompleted` khi nhận `.completed` event và in ra `onDisposed` khi subject đã dispose.
+- Các bạn hãy tập thói quen thêm subscription như trên vào dispose bag để luôn đảm bảo không leak memory.
+- Đưa `.completed` event vào subject. Nó sẽ terminate observable sequence của subject.
+
+Kết quả thu được như sau:
+
+```
+onCompleted
+onDisposed
+```
+
+Mọi loại subject, khi nào bị terminate, nó sẽ phát lại stop event cho các subscriber của nó. 
+
+### Working with behavior subjects
+### Working with replay subjects
+### Working with variables
+
+## More
+
+Quay lại chapter trước [Chapter 2: Observables][Chapter 2]
+
+Đi đến chapter sau [Chapter 4: Subjects][Chapter 4]
+
+Quay lại [RxSwiftDiary's Menu][Diary]
+
+---
+[Chapter 2]: ./Section1-Chapter2.md "Observables"
+[Chapter 4]: ./Section1-Chapter4.md "Observables and Subjects in Practice"
+[Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
