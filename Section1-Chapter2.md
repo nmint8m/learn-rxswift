@@ -132,7 +132,7 @@ let observer = NotificationCenter.default.addObserver(forName: .UIKeyboardDidCha
 	}
 ```
 
-subscribe RxSwift observable cũng tương tự, thay vì gọi bằng `addObserver()` thì bạn gọi `subscribe()`. Một điểm khác biệt nữa, khi cần sử dụng `NotificationCenter` thì phải dùng singleton instance `.default` của nó, nhưng đối với Rx thì các observable tách biệt với nhau. Một điều khá quan trọng, một observable sẽ không send event cho tới khi nó có subscriber. 
+`subscribe` RxSwift observable cũng tương tự, thay vì gọi bằng `addObserver()` thì bạn gọi `subscribe()`. Một điểm khác biệt nữa, khi cần sử dụng `NotificationCenter` thì phải dùng singleton instance `.default` của nó, nhưng đối với Rx thì các observable tách biệt với nhau. Một điều khá quan trọng, một observable sẽ không send event cho tới khi nó có subscriber. 
 
 ```swift
 observable2.subscribe { event in
@@ -280,7 +280,7 @@ subscription8.dispose()
 - In mỗi event được phát ra.
 - Để cancel một subscription, gọi `dispose()`. Sau khi bạn cancel subsciption, hay còn gọi là dispose nó, observable sẽ dừng việc phát ra event.
 
-Việc quản lý mỗi subscription sẽ rấy là chán, bởi bậy RxSwift giới thiệu kiểu `DisposeBag`. Một dispose bag giữ nhiều disposable, được thêm vào bởi method `.disposed(by:)` và nó sẽ gọi `dispose()` cho mỗi disposable khi dispose bag sắp được giải phóng.
+Việc phải quản lý cho mỗi subscription sẽ rấy là chán, bởi bậy RxSwift giới thiệu kiểu `DisposeBag`. Một dispose bag có thể giữ nhiều disposable, được thêm vào bởi method `.disposed(by:)` và nó sẽ tự gọi `dispose()` cho mỗi disposable khi dispose bag sắp được giải phóng.
 
 ```swift
 let disposeBag = DisposeBag()
@@ -299,8 +299,6 @@ Observable.of("A", "B", "C").subscribe {
 Pattern này bạn sẽ sử dụng rất là nhiều khi làm việc với Rx: khi tạo và subscribing một observable và ngay lập tức add subscription vào dispose bag.
 
 __Lưu ý__: Nếu bạn quên thêm subscription vào dispose bag hoặc không tự gọi `dispose()` khi kết thúc subscribe hoặc trong một số trường hợp observable bị terminated, sẽ dẫn đến `leak memory`. Cũng đừng lo lắng quá, Swift compiler sẽ cảnh báo bạn các case trên.
-
-In the previous examples, you’ve created observables with specific .next event elements. Another way to specify all events that an observable will emit to subscribers is by using the create operator.
 
 Ở ví dụ phía trên, bạn đã tạo ra được observable với `.next` event xác định với operator `of`. Một cách khác định nghĩa tất cả các event mà một observable sẽ phát ra là bằng cách sử dụng `create` operator.
 
