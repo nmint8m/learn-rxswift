@@ -11,17 +11,17 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 - [Chapter 1: Hello RxSwift][Chapter 1]
 - [Chapter 2: Observables][Chapter 2]
 - [Chapter 3: Subjects][Chapter 3] `[/WIP]`
-- [Chapter 4: Observables and Subjects in practice]() `[/WIP]`
+- [Chapter 4: Observables and Subjects in practice][Chapter 4] `[/WIP]`
 
 ### Section II: Operatores and best practices
 
-- [Chapter 5: Filtering operators]() `[/WIP]`
-- [Chapter 6: Filtering operators in practice]() `[/WIP]`
-- [Chapter 7: Transforming operators]() `[/WIP]`
-- [Chapter 8: Transforming operators in practice]() `[/WIP]`
-- [Chapter 9: Combining operators]() `[/WIP]`
-- [Chapter 10: Combining operators in practice]() `[/WIP]`
-- [Chapter 11: Time-based operators]() `[/WIP]`
+- [Chapter 5: Filtering operators][Chapter 5] `[/WIP]`
+- [Chapter 6: Filtering operators in practice][Chapter 6] `[/WIP]`
+- [Chapter 7: Transforming operators][Chapter 7] `[/WIP]`
+- [Chapter 8: Transforming operators in practice][Chapter 8] `[/WIP]`
+- [Chapter 9: Combining operators][Chapter 9] `[/WIP]`
+- [Chapter 10: Combining operators in practice][Chapter 10] `[/WIP]`
+- [Chapter 11: Time-based operators][Chapter 11] `[/WIP]`
 
 ### Section III: iOS Apps with RxCocoa
 
@@ -59,5 +59,13 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 [Chapter 1]: ./Section1-Chapter1.md "Hello RxSwift"
 [Chapter 2]: ./Section1-Chapter2.md "Observables"
 [Chapter 3]: ./Section1-Chapter3.md "Subjects"
+[Chapter 4]: ./Section1-Chapter4.md "Observables and Subjects in practice"
+[Chapter 5]: ./Section2-Chapter5.md "Filtering operators"
+[Chapter 6]: ./Section2-Chapter6.md "Filtering operators in practice"
+[Chapter 7]: ./Section2-Chapter7.md "Transforming operators"
+[Chapter 8]: ./Section2-Chapter8.md "Transforming operators in practice"
+[Chapter 9]: ./Section2-Chapter9.md "Combining operators"
+[Chapter 10]: ./Section2-Chapter10.md "Combining operators in practice"
+[Chapter 11]: ./Section2-Chapter11.md "Time-based operators"
 
 [Reference 1]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"
