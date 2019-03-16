@@ -204,7 +204,84 @@ Nhưng đặt trường hợp chúng ta cần hiển thị nhiều hơn một gi
 
 ### Working with replay subjects
 
+`ReplaySubject` sẽ tạm thời lưu trữ (buffer) những elements gần nhất được phát ra với một số lượng được định sẵn, sau đó phát lại buffer đó đến các subscriber mới.
+
+Theo dõi marble diagram sau đây đang mô tả một replay subject với buffer size là 2. Subscriber đầu tiên (được mô tả ở dòng thứ hai), đã subscribe replay subject (được mô tả ở dòng đầu tiên), cho nên nó nhận được event `1`, `2` được phát tới nó. Subscriber thứ hai là một subscriber mới (được mô tả ở dòng thứ ba) subscribe replay subject sau khi event `2` được phát, tuy nhiên nó vẫn sẽ nhận được cả event `1` và `2` vốn đã được phát trước đó.
+
+<center>
+	<img src="./c3-img3.png" height="300">
+</center>
+
+Lưu ý khi sử dụng replay subject, buffer sẽ được giữ lại trong bộ nhớ, vì vậy không nên khai báo buffer size quá lớn, đặc biệt là đối với những kiểu tiêu tốn nhiều bộ nhớ như image. 
+
+Thêm một điều cần lưu ý nữa khi tạo ra một replay subject có kiểu là array. Mỗi element được phát ra là một array, cho nên buffer size của nó sẽ là nhiều array. Vậy nên nó rất dễ tiêu tốn bộ nhớ nếu bạn không cẩn thận.
+
+Thử đoạn code sau trong playground:
+
+```swift
+let disposeBag = DisposeBag()
+let subject = ReplaySubject<String>.create(bufferSize: 2)
+subject.onNext("1")
+subject.onNext("2")
+subject.subscribe { print("Subscriber 1: \($0)") }
+    .disposed(by: disposeBag)
+subject.onNext("3")
+subject.subscribe { print("Subscriber 2: \($0)") }
+    .disposed(by: disposeBag)
+```
+
+Kết quả thu được:
+
+```
+Subscriber 1: next(1)
+Subscriber 1: next(2)
+Subscriber 1: next(3)
+Subscriber 2: next(2)
+Subscriber 2: next(3)
+```
+
+Tiếp theo, so sánh kết quả của hai đoạn code sau:
+
+```swift
+let disposeBag = DisposeBag()
+let subject = ReplaySubject<String>.create(bufferSize: 2)
+subject.onNext("1")
+subject.onNext("2")
+subject.onError(MyError.someError)
+subject.subscribe{ print("Subscriber 3: \($0)")}.disposed(by: disposeBag)
+```
+
+```
+Subscriber 3: next(1)
+Subscriber 3: next(2)
+Subscriber 3: error(someError)
+```
+
+Và:
+
+```swift
+let disposeBag = DisposeBag()
+let subject = ReplaySubject<String>.create(bufferSize: 2)
+subject.onNext("1")
+subject.onNext("2")
+subject.onError(MyError.someError)
+subject.dispose()
+subject.subscribe{ print("Subscriber 4: \($0)")}.disposed(by: disposeBag)
+```
+
+```
+Subscriber 4: error(Object `RxSwift.(unknown context at 0x1230adc98).ReplayMany<Swift.String>` was already disposed.)
+```
+
+Chuyện gì xảy ra với subscriber 3 vậy? Replay subject đáng lẽ phải bị terminate bởi error, mà error này lại được phát lại tới subscriber mới. Câu trả lời là bởi vì buffer vẫn còn được duy trì, cho nên nó sẽ được replay lại tới subscriber mới. Vậy nên trước khi stop event này được phát lại, thêm dòng code `subject.dispose()` như ở ví dụ subscriber 4. Bằng cách gọi trực tiếp `dispose()`, subscriber mới sẽ chỉ nhận được error event thông báo rằng replay subject đã được disposed.
+
+Thường thì chúng ta sẽ không trực tiếp gọi `dispose()` cho replay subject, bởi vì ta sẽ thêm các subscription vào dispose bag (tránh tạo ra strong reference life cycle), và mọi thứ sẽ được dispose và deallocate khi owner của nó bị deallocate.
+
+Tóm lại, bằng cách sử dụng publish, behavior hay replay subject, chúng ta đã có thể handle khá là nhiều thứ rồi. Nhưng đôi lúc, bạn cần Variable để thực hiện một số task, cùng tìm hiểu trong phần dưới nhe.
+
 ### Working with variables
+
+
 
 ## More
 
