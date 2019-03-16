@@ -139,7 +139,7 @@ subject.onCompleted()
 
 - Khởi tạo một dispose bag và một subject.
 - Subscribe subject, nó sẽ in ra element nếu nhận `.next` event, in ra `onCompleted` khi nhận `.completed` event và in ra `onDisposed` khi subject đã dispose.
-- Các bạn hãy tập thói quen thêm subscription như trên vào dispose bag để luôn đảm bảo không leak memory.
+- Các bạn hãy tập thói quen thêm subscription vào dispose bag để luôn đảm bảo không leak memory.
 - Đưa `.completed` event vào subject. Nó sẽ terminate observable sequence của subject.
 
 Kết quả thu được như sau:
@@ -152,7 +152,58 @@ onDisposed
 Mọi loại subject, khi nào bị terminate, nó sẽ phát lại stop event cho các subscriber của nó. 
 
 ### Working with behavior subjects
+
+`BehaviorSubject` hoạt động tương tự như `PublishSubject`, ngoại trừ nó sẽ replay `.next` event mới nhất đến subscriber. Xem marble diagram dưới đây:
+
+<center>
+	<img src="./c3-img2.png" height="200">
+</center>
+
+Ở đây, dòng đầu tiên là một subject. Subscriber đầu tiên là ở dòng thứ hai, subscriber này subscribe sau khi event `1` được phát nhưng trước event `2`, nó sẽ ngay lập tức nhận được event `1` ngay khi vừa subscribe và nhận event `2`, `3` sau đó khi nó được phát.
+
+Tương tự subscriber thứ hai subscribe sau event `2` được phát nhưng trước event `3`, vậy nên nó sẽ nhận được event `2` ngay lập tức, và nhận event `3` được phát sau đó.
+
+```swift
+let disposeBag = DisposeBag()
+let subject = BehaviorSubject<String>(value: "1")
+subject.subscribe{ print("Subscriber 1: \($0)") }
+    .disposed(by: disposeBag)
+subject.onNext("2")
+subject.subscribe{ print("Subscriber 2: \($0)") }
+    .disposed(by: disposeBag)
+subject.onNext("3")
+```
+
+Kết quả thu được:
+
+```
+Subscriber 1: next(1)
+Subscriber 1: next(2)
+Subscriber 2: next(2)
+Subscriber 1: next(3)
+Subscriber 2: next(3)
+```
+Điều gì xảy ra khi thêm `.error` event vào behavior subject và tạo mới một subscription đế subject?
+
+```swift
+subject.subscribe{ print("Subscriber 3: \($0)")}
+subject.onError(MyError.someError)
+```
+
+Kết quả thu được là subscriber thứ ba sẽ lặp lại 
+
+```
+Subscriber 1: error(someError)
+Subscriber 2: error(someError)
+Subscriber 3: error(someError)
+```
+
+Behavior subject hữu dụng khi chúng ta muốn hiển thị data mới nhất lên view. Ví dụ chúng ta có thể bind các control trong màn hình profile vào một behavior subject, nhờ đó các dữ liệu mới nhất vận có thể được hiển thị trong khi app đang fetch dữ liệu mới về.
+
+Nhưng đặt trường hợp chúng ta cần hiển thị nhiều hơn một giá trị gần nhất thì sao. Ví dụ ở màn hình search, chúng ta muốn hiển thị 5 từ khoá được search gần nhất thì sao. Đối với những trường hợp như vậy replay subject được áp dụng.
+
 ### Working with replay subjects
+
 ### Working with variables
 
 ## More
