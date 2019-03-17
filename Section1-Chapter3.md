@@ -76,7 +76,7 @@ Có bốn loại subject trong RxSwift:
 `PublishSubject` được sử dụng khi subscriber sẽ được notify chỉ bởi những event được phát kể từ thời điểm nó đăng ký subscribe observable trở đi, cho đến khi nào chúng unsubscribe hoặc là subject đó bị terminate bởi event `.completed` hoặc `.error`.
 
 <center>
-	<img src="./Image/c3-img1.png" height="200">
+	<img src="./Document/Image/Section1/c3-img1.png" height="200">
 </center>
 
 Vì subscription thứ hai subscribe sau khi `1` được phát, vậy nên nó sẽ không nhận được event `1`, mà chỉ nhận được event `2` và `3`. Tương tự, subscription thứ ba chỉ nhận được event `3`.
@@ -156,7 +156,7 @@ Mọi loại subject, khi nào bị terminate, nó sẽ phát lại stop event c
 `BehaviorSubject` hoạt động tương tự như `PublishSubject`, ngoại trừ nó sẽ replay `.next` event mới nhất đến subscriber. Xem marble diagram dưới đây:
 
 <center>
-	<img src="./c3-img2.png" height="200">
+	<img src="./Document/Image/Section1/c3-img2.png" height="200">
 </center>
 
 Ở đây, dòng đầu tiên là một subject. Subscriber đầu tiên là ở dòng thứ hai, subscriber này subscribe sau khi event `1` được phát nhưng trước event `2`, nó sẽ ngay lập tức nhận được event `1` ngay khi vừa subscribe và nhận event `2`, `3` sau đó khi nó được phát.
@@ -209,7 +209,7 @@ Nhưng đặt trường hợp chúng ta cần hiển thị nhiều hơn một gi
 Theo dõi marble diagram sau đây đang mô tả một replay subject với buffer size là 2. Subscriber đầu tiên (được mô tả ở dòng thứ hai), đã subscribe replay subject (được mô tả ở dòng đầu tiên), cho nên nó nhận được event `1`, `2` được phát tới nó. Subscriber thứ hai là một subscriber mới (được mô tả ở dòng thứ ba) subscribe replay subject sau khi event `2` được phát, tuy nhiên nó vẫn sẽ nhận được cả event `1` và `2` vốn đã được phát trước đó.
 
 <center>
-	<img src="./c3-img3.png" height="300">
+	<img src="./Document/Image/Section1/c3-img3.png" height="200">
 </center>
 
 Lưu ý khi sử dụng replay subject, buffer sẽ được giữ lại trong bộ nhớ, vì vậy không nên khai báo buffer size quá lớn, đặc biệt là đối với những kiểu tiêu tốn nhiều bộ nhớ như image. 
@@ -277,17 +277,44 @@ Chuyện gì xảy ra với subscriber 3 vậy? Replay subject đáng lẽ phả
 
 Thường thì chúng ta sẽ không trực tiếp gọi `dispose()` cho replay subject, bởi vì ta sẽ thêm các subscription vào dispose bag (tránh tạo ra strong reference life cycle), và mọi thứ sẽ được dispose và deallocate khi owner của nó bị deallocate.
 
-Tóm lại, bằng cách sử dụng publish, behavior hay replay subject, chúng ta đã có thể handle khá là nhiều thứ rồi. Nhưng đôi lúc, bạn cần Variable để thực hiện một số task, cùng tìm hiểu trong phần dưới nhe.
+Tóm lại, bằng cách sử dụng publish, behavior hay replay subject, chúng ta đã có thể handle khá là nhiều thứ rồi. Nhưng đôi lúc, bạn cần Variable để thực hiện một số task, cùng tìm hiểu trong phần dưới nhé.
 
 ### Working with variables
 
+Như đã đề cập lúc đầu, `Variable` bọc `BehaviorSubject` lại và giữ các gía trị hiện tại thành `state`. Chúng ta có thể access current value thông qua property `value`. Tuy nhiên, không giống những subject và những observable khác, chúng ta cũng có thể sử dụng property `value` đó để set element mới vào variable. Nói cách khác là chúng ta không cần phải gọi `onNext(_:)` nữa.
 
+Bởi vì nó giống như behavior subject, cho nên variable được khởi tạo với initial value và nó phát lại giá trị initial value hoặc là giá trị mới nhất tới new subscriber. Để có thể access variable dưới dạng một observable, chúng ta gọi `asObservable()` cho nó.
+
+Variable khác với các subject khác ở đặc điểm là: 
+- Nó không phát `.error` event. Vậy nên là bạn có thể lắng nghe `.error` event nhưng không thể add `.error` event vào variable. 
+- Variable tự động complete khi nó sắp bị deallocated, vậy nên chúng ta cũng không cần phải add `.completed` event vào variable.
+
+```swift
+example(of: "Variable") {
+    let disposeBag = DisposeBag()
+    let variable = Variable<String>("1")
+    variable.asObservable()
+        .subscribe{ print("Subscriber 1: \($0)") }
+        .disposed(by: disposeBag)
+    variable.value = "2"
+}
+```
+
+Kết quả thu được:
+
+```
+Subscriber 1: next(1)
+Subscriber 1: next(2)
+Subscriber 1: completed
+```
+
+Chúng ta có thể sử dụng variable như observable khi chúng ta chỉ muốn nhận `.next` event mới nhất được phát và bỏ qua những khác.
 
 ## More
 
 Quay lại chapter trước [Chapter 2: Observables][Chapter 2]
 
-Đi đến chapter sau [Chapter 4: Subjects][Chapter 4]
+Đi đến chapter sau [Chapter 4: Observables and Subjects in Practice][Chapter 4]
 
 Quay lại [RxSwiftDiary's Menu][Diary]
 
