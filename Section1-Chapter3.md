@@ -4,9 +4,9 @@
 
 ## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 3: Subjects
 
-Ở phần trước, chúng ta đã biết được observable là gì, cách tạo ra, subscibe nó như thế nào và dispose nó ra sao. Observable là một thành phần cơ bản của RxSwift, tuy nhiên cái mà chúng ta thực sự cần khi develop app là tạo new value và add nó vào observable lúc run time, và những value này được phát tới các subscriber. Cái mà chúng ta thực sự cần là một thứ vừa có thể hành động như một observable (phát) và như một observer (thu). Thành phần đó được gọi là `Subject`.
+Ở phần trước, chúng ta đã biết được observable là gì, cách tạo ra, subscribe nó như thế nào và dispose nó ra sao. Observable là một thành phần cơ bản của RxSwift, tuy nhiên cái mà chúng ta thực sự cần khi develop app là tạo new value và add nó vào observable ngay tại lúc run time, và những value này được phát tới các subscriber. Có nghĩa là cái mà chúng ta cần là một thứ vừa có thể hành động như một observable (phát) và như một observer (thu). Thứ giúp ta làm được như vậy được gọi là `Subject`.
 
-Trong phần này chúng ta sẽ tìm hiểu các loại subject khác nhau trong RxSwift, cách hoạt động của nó như thế nào, và tại sao chúng ta sẽ chọn loại subject nhất định dựa vào use case được áp dụng.
+Trong phần này chúng ta sẽ tìm hiểu các loại subject khác nhau trong RxSwift, cách hoạt động của nó như thế nào, và tại sao chúng ta sẽ chọn loại subject nhất định  vào use case được áp dụng.
 
 __Menu__
 
@@ -39,7 +39,7 @@ subject.onNext("Is anyone listening?")
 let subscriptionOne = subject.subscribe(onNext: { print($0) })
 ```
 
-Nhưng console lúc này vẫn trống, vì sao vậy? Bởi vì `PublishSubject` chỉ phát event đến cho những subscriber hiện tại đang subscibe nó. Vậy nên nếu chúng ra không thể observer được những thông tin đã được phát trong quá khứ tính từ thời điểm bắt đầu subscribe.
+Nhưng console lúc này vẫn trống, vì sao vậy? Bởi vì `PublishSubject` chỉ phát event đến những subscriber hiện tại đang subscribe nó. Vậy nên nếu chúng ra không thể lắng nghe được những thông tin đã được phát trong quá khứ tính từ thời điểm bắt đầu subscribe.
 
 Vấn đề được xử lý khi thêm đoạn code sau.
 
@@ -55,20 +55,20 @@ Kết quả thu được.
 1
 ```
 
-Chúng ta vừa mới đi qua một khởi đầu nhẹ nhàng, ở phần dưới chúng ta sẽ tìm hiểu sâu hơn về subject.
+Chúng ta vừa mới đi qua một khởi đầu nhẹ nhàng với subject, ở phần dưới chúng ta sẽ tìm hiểu sâu hơn về nó.
 
 ### What are subjects?
 
-Subject hoạt động vừa là observable, vừa là observer. Ta đã thấy cách mà nó nhận event và được subscribe tới ở phía trên.
+Subject hoạt động vừa là observable, vừa là observer. Ta đã thấy cách mà nó nhận event và được subscribe tới như thế nào ở phía trên.
 
-- Subject nhận vào `.next` event -> Subject là observer
-- Mỗi khi subject nhận một event thì nó sẽ quay ngược lại và phát event cho các subscriber của nó. -> Subject là observable
+- Subject nhận vào `.next` event -> Subject là observer.
+- Mỗi khi subject nhận một event thì nó sẽ quay ngược lại và phát event cho các subscriber của nó. -> Subject là observable.
 
 Có bốn loại subject trong RxSwift:
 
-- `PublishSubject`: Bắt đầu với giá trị rỗng và chỉ phát new value khi đến subsciber.
+- `PublishSubject`: Bắt đầu với giá trị rỗng và chỉ phát new value đến subscriber.
 - `BehaviorSubject`: Bắt đầu với một giá trị khởi tạo, sau đó lặp lại nó hoặc lặp lại element mới nhất đến subscriber mới.
-- `ReplaySubject`: Được khởi tạo với một buffer size nhất định và duy trì số lượng element được replay tới subscriber tương ứng với buffer size đó.
+- `ReplaySubject`: Được khởi tạo với một buffer size nhất định và duy trì số lượng element được replay tới subscriber sao cho tương ứng với buffer size.
 - `Variable`: Nó giống như một `BehaviorSubject`, giữ các giá trị hiện tại thành `state`, và chỉ phát lại duy nhất giá trị mới nhất hoặc giá trị khởi tạo cho những subscriber mới.
 
 ### Working with publish subjects
@@ -149,7 +149,7 @@ onCompleted
 onDisposed
 ```
 
-Mọi loại subject, khi nào bị terminate, nó sẽ phát lại stop event cho các subscriber của nó. 
+Mọi loại subject, khi nào bị terminate (bởi error hoặc completed event), nó sẽ phát lại stop event cho các subscriber của nó. 
 
 ### Working with behavior subjects
 
@@ -159,7 +159,7 @@ Mọi loại subject, khi nào bị terminate, nó sẽ phát lại stop event c
 	<img src="./Document/Image/Section1/c3-img2.png" height="200">
 </center>
 
-Ở đây, dòng đầu tiên là một subject. Subscriber đầu tiên là ở dòng thứ hai, subscriber này subscribe sau khi event `1` được phát nhưng trước event `2`, nó sẽ ngay lập tức nhận được event `1` ngay khi vừa subscribe và nhận event `2`, `3` sau đó khi nó được phát.
+Ở đây, dòng đầu tiên là một subject. Subscriber đầu tiên là ở dòng thứ hai, subscriber này subscribe sau khi event `1` được phát nhưng trước event `2`, nó sẽ ngay lập tức nhận được event `1` ngay khi vừa subscribe và nhận event `2`, `3` được phát sau đó.
 
 Tương tự subscriber thứ hai subscribe sau event `2` được phát nhưng trước event `3`, vậy nên nó sẽ nhận được event `2` ngay lập tức, và nhận event `3` được phát sau đó.
 
@@ -204,7 +204,7 @@ Nhưng đặt trường hợp chúng ta cần hiển thị nhiều hơn một gi
 
 ### Working with replay subjects
 
-`ReplaySubject` sẽ tạm thời lưu trữ (buffer) những elements gần nhất được phát ra với một số lượng được định sẵn, sau đó phát lại buffer đó đến các subscriber mới.
+`ReplaySubject` sẽ tạm thời lưu trữ (buffer) những element gần nhất được phát ra với một số lượng được định sẵn, sau đó phát lại buffer đó đến các subscriber mới.
 
 Theo dõi marble diagram sau đây đang mô tả một replay subject với buffer size là 2. Subscriber đầu tiên (được mô tả ở dòng thứ hai), đã subscribe replay subject (được mô tả ở dòng đầu tiên), cho nên nó nhận được event `1`, `2` được phát tới nó. Subscriber thứ hai là một subscriber mới (được mô tả ở dòng thứ ba) subscribe replay subject sau khi event `2` được phát, tuy nhiên nó vẫn sẽ nhận được cả event `1` và `2` vốn đã được phát trước đó.
 
@@ -283,7 +283,7 @@ Tóm lại, bằng cách sử dụng publish, behavior hay replay subject, chún
 
 Như đã đề cập lúc đầu, `Variable` bọc `BehaviorSubject` lại và giữ các gía trị hiện tại thành `state`. Chúng ta có thể access current value thông qua property `value`. Tuy nhiên, không giống những subject và những observable khác, chúng ta cũng có thể sử dụng property `value` đó để set element mới vào variable. Nói cách khác là chúng ta không cần phải gọi `onNext(_:)` nữa.
 
-Bởi vì nó giống như behavior subject, cho nên variable được khởi tạo với initial value và nó phát lại giá trị initial value hoặc là giá trị mới nhất tới new subscriber. Để có thể access variable dưới dạng một observable, chúng ta gọi `asObservable()` cho nó.
+Bởi vì nó giống như behavior subject, cho nên variable được khởi tạo với initial value và nó phát lại giá trị initial value hoặc là giá trị mới nhất tới new subscriber. Để có thể access variable dưới dạng một observable, bằng cách chúng ta gọi `asObservable()` cho nó.
 
 Variable khác với các subject khác ở đặc điểm là: 
 - Nó không phát `.error` event. Vậy nên là bạn có thể lắng nghe `.error` event nhưng không thể add `.error` event vào variable. 
