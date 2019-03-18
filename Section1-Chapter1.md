@@ -366,8 +366,13 @@ Giờ hãy học cách tạo ra một Observable đơn giản, sử dụng MVVM 
 
 Quay lại [RxSwiftDiary's Menu][Diary]
 
+## Reference
+
+[RxSwift: Reactive Programming with Swift][Reference] 
+
 ---
 [Chapter 2]: ./Section1-Chapter2.md "Observables"
 
 [Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
 
+[Reference]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"

@@ -10,7 +10,7 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 
 - [Chapter 1: Hello RxSwift][Chapter 1]
 - [Chapter 2: Observables][Chapter 2]
-- [Chapter 3: Subjects][Chapter 3] `[/WIP]`
+- [Chapter 3: Subjects][Chapter 3]
 - [Chapter 4: Observables and Subjects in practice][Chapter 4] `[/WIP]`
 
 ### Section II: Operatores and best practices
