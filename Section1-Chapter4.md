@@ -142,6 +142,124 @@ Tới đây thì chúng ta đã có thể thấy lợi ích của RxSwift rồi,
 
 ### Talking to other view controllers via subjects
 
+Trong phần này ta sẽ kết nối class `PhotosViewController` đến `MainViewController` để lấy những photo được user chọn từ Camera Roll.
+
+Đầu tiên, chúng ta cần push `PhotosViewController` vào navigation stack. Mở file `MainViewController.swift` tìm đến function `actionAdd()` và xoá hết code cũ ở đó đi và thay thế bằng:
+
+```swift
+    @IBAction func actionAdd() {
+        guard let viewController = storyboard!.instantiateViewController(withIdentifier: "PhotosViewController") as? PhotosViewController else { return }
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+```
+
+Chạy app và tap vào button `+` để tới Camera Roll. Lần đầu tiên khi chúng ta làm vậy, chúng ta cần cấp quyền access vào Photo Library:
+
+<center>
+	<img src="./Document/Image/Section1/c4-img6.png" height="300">
+</center>
+
+Sau khi tap OK, chúng ta sẽ thấy photo controller như bên dưới. Có thể có sự khác biệt giữa device và simulator, nên chúng ta cần back và thử lại sau khi cấp phép truy cập photo. Lần thứ hai, chúng ta nhất định sẽ thấy được các sample photo trên Simulator.
+
+<center>
+	<img src="./Document/Image/Section1/c4-img7.png" height="300">
+</center>
+
+Nếu như chúng ta build app sử dụng Cocoa pattern, bước tiếp theo chúng ta sẽ add delegate protocol để photo view controller có thể giao tiếp ngược lại với main view controller, và đó là cách implement theo hướng non-reactive:
+
+<center>
+	<img src="./Document/Image/Section1/c4-img8.png" height="300">
+</center>
+
+Tuy nhiên, đối với RxSwift thì không như vậy, chúng ta có một cách universal hơn giúp hai class giao tiếp với nhau - đó là observable. Chúng ta không cần phải định nghĩa protocol bởi observable có thể chuyển nhiều kiểu message đến một hoặc nhiều observer khác nhau.
+
+#### Creating an observable out of the selected photos
+
+Bước tiếp theo, chúng ta add subject vào `PhotosViewController`, subject đó có nhiệm vụ phát event `.next` mỗi khi user tap vào một ảnh trong Camera Roll. Mở file `PhotosViewController.swift` và thêm dòng code sau lên phía đầu:
+
+```swift
+import RxSwift
+```
+
+Chúng ta cần add một `PublishSubject` để lấy các ảnh được chọn, nhưng chúng ta sẽ không public access nó, bởi vì làm như vậy sẽ khiến các class khác có thể gọi `onNext(_)`, buộc subject phải phát ra value. Có thể trong trường hợp khác chúng ta cần phải làm như vậy, nhưng đối với trường hợp này thì không.
+
+Thêm các property vào `PhotosViewController`:
+
+```swift
+    private let selectedPhotosSubject = PublishSubject<UIImage>()
+    var selectedPhotos: Observable<UIImage> {
+        return selectedPhotosSubject.asObservable()
+    }
+```
+
+Ở đây chúng ta khai báo private đối với property `selectedPhotosSubject` (`PublishSubject` phát ra các photo được chọn) và public với property `selectedPhotos` (chỉ lấy các tính chất của observable từ subject). Subscribe đến `selectedPhotos` là cách mà main view controller lắng nghe photo sequence mà không gặp trở ngại nào.
+
+`PhotosViewController` đã chứa code đọc ảnh từ Camera Roll và hiển thị nó lên collection view. Tất cả những gì chúng ta cần làm là thêm đoạn code phát ra những ảnh được chọn khi người dùng tap lên collection view cell.
+
+Trong function `collectionView(_:didSelectItemAt:)`, code có sẵn đã giúp chúng ta lấy được ảnh user đang chọn. Việc chúng ta cần làm là trong closure `imageManager.requestImage(...)` là phát `.next` event. Add đoạn code sau phía trong closure, sau dòng lệnh `guard`:
+
+```swift
+if let isThumbnail = info[PHImageResultIsDegradedKey as NSString] as? Bool,
+                !isThumbnail {
+    self?.selectedPhotosSubject.onNext(image)
+}
+```
+
+Vậy là từ giờ chúng ta không cần phải xài delegate protocol nữa vì mối quan hệ giữa các view controller đã trở nên đơn giản hơn nhiều:
+
+<center>
+	<img src="./Document/Image/Section1/c4-img9.png" height="300">
+</center>
+
+#### Observing the sequence of selected photos
+
+Nhiệm vụ tiếp theo là trở về `MainViewController.swift`, thêm đoạn code lắng nghe photo sequence.
+
+Tìm tới function `actionAdd()` thêm đoạn code sau ngay trước đoạn code push new view controller vào navigation stack:
+
+```swift
+viewController.selectedPhotos
+    .subscribe(
+        onNext: { [weak self] newImage in
+        },
+        onDisposed: {
+            print("Completed photo selection")
+    }).disposed(by: disposeBag)
+```
+
+Trước khi push view controller, chúng ta subscribe event từ property `selectedPhoto` của nó. Cần quan tâm tới hai event là `.next` (khi user tap vào một ảnh) và khi subscription bị dispose.
+
+Thêm đoạn code vào closure `.onNext`:
+
+```swift
+guard let this = self else { return }
+this.images.value.append(newImage)
+```
+
+Chạy app và kiểm tra thành quả nào. Cool! ❄️
+
+<center>
+	<img src="./Document/Image/Section1/c4-img10.png" height="300">
+</center>
+
+#### Disposing subscriptions - review
+
+Tới đoạn này thì code đã hoạt động đúng mong đợi rồi, nhưng mà bạn thử các bước sau đi: thêm một vài hình vào collage rồi quay lại main screen và kiểm tra console. Bạn không thấy dòng "Completed photo selection" được in ra. Vậy có nghĩa là dòng lệnh `print` trong `onDispose` closure lúc này không bao giờ được gọi tới, tương đương với việc subscription không bao giờ bị dispose và không giải phóng memory! 💥
+
+Chúng ta đã subscribe observable sequence rồi vất nó cho dispose bag của main screen. Subscription này sẽ bị dispose chỉ khi bag object bị release, hoặc là sequence kết thúc bởi error hoặc completed event.
+
+Bởi vì main screen không bị release và photo sequence cũng không bị kết thúc, vậy nên subscription này cứ trường tồn như vậy.
+
+Vậy nên tốt nhất là trước khi back về main screen từ photo view controller, ta nên phát `.completed` event để cho tất cả các observer của nó được hoàn thành và dispose.
+
+Mở file `PhotosViewController.swift`, phát `.completed` event cho subject trong function `viewWillDisappear(_:)`:
+
+```swift
+selectedPhotosSubject.onCompleted()
+```
+
+Perfect! ✅
+
 ### Creating a custom observable
 
 ### RxSwift traits in practice
