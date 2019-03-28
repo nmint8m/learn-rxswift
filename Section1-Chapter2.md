@@ -529,7 +529,12 @@ Quay lại chapter trước [Chapter 1: Hello RxSwift][Chapter 1]
 
 Quay lại [RxSwiftDiary's Menu][Diary]
 
+## Reference
+
+[RxSwift: Reactive Programming with Swift][Reference] 
+
 ---
 [Chapter 1]: ./Section1-Chapter1.md "Hello RxSwift"
 [Chapter 3]: ./Section1-Chapter3.md "Subjects"
 [Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
+[Reference]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"

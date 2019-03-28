@@ -318,7 +318,12 @@ Quay lại chapter trước [Chapter 2: Observables][Chapter 2]
 
 Quay lại [RxSwiftDiary's Menu][Diary]
 
+## Reference
+
+[RxSwift: Reactive Programming with Swift][Reference] 
+
 ---
 [Chapter 2]: ./Section1-Chapter2.md "Observables"
 [Chapter 4]: ./Section1-Chapter4.md "Observables and Subjects in Practice"
 [Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
+[Reference]: https://store.raywenderlich.com/products/rxswift "RxSwift: Reactive Programming with Swift"
