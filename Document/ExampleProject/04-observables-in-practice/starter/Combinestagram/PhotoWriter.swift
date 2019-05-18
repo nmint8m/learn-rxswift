@@ -30,6 +30,11 @@ class PhotoWriter {
         case couldNotSavePhoto
     }
 
+    private let selectedPhotosSubject = PublishSubject<UIImage>()
+    var selectedPhotos: Observable<UIImage> {
+        return selectedPhotosSubject.asObservable()
+    }
+
     static func save(_ image: UIImage) -> Observable<String> {
         return Observable.create({ observer in
             var savedAssetId: String?

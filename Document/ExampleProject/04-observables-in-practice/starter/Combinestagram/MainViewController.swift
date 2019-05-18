@@ -25,31 +25,72 @@ import RxSwift
 
 class MainViewController: UIViewController {
 
-  @IBOutlet weak var imagePreview: UIImageView!
-  @IBOutlet weak var buttonClear: UIButton!
-  @IBOutlet weak var buttonSave: UIButton!
-  @IBOutlet weak var itemAdd: UIBarButtonItem!
+    @IBOutlet weak var imagePreview: UIImageView!
+    @IBOutlet weak var buttonClear: UIButton!
+    @IBOutlet weak var buttonSave: UIButton!
+    @IBOutlet weak var itemAdd: UIBarButtonItem!
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+    private let disposeBag = DisposeBag()
+    private let images = Variable<[UIImage]>([])
 
-  }
-  
-  @IBAction func actionClear() {
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
-  }
+        images.asObservable()
+            .subscribe(onNext: { [weak self] photos in
+                guard let this = self,
+                    let preview = this.imagePreview else { return }
+                preview.image = UIImage.collage(images: photos,
+                                                size: preview.frame.size)
+            }).disposed(by: disposeBag)
+        images.asObservable()
+            .subscribe(onNext: { [weak self] photos in
+                guard let this = self else { return }
+                this.updateUI(photos: photos)
+            }).disposed(by: disposeBag)
+    }
 
-  @IBAction func actionSave() {
+    private func updateUI(photos: [UIImage]) {
+        buttonSave.isEnabled = photos.count > 0 && photos.count % 2 == 0
+        buttonClear.isEnabled = photos.count > 0
+        itemAdd.isEnabled = photos.count < 6
+        title = photos.count > 0 ? "\(photos.count) photos" : "Collage"
+    }
 
-  }
+    @IBAction func actionClear() {
+        images.value = []
+    }
 
-  @IBAction func actionAdd() {
+    @IBAction func actionSave() {
+        guard let image = imagePreview.image else { return }
+        PhotoWriter.save(image)
+            .asSingle()
+            .subscribe(onSuccess: { [weak self] id in
+                self?.showMessage("Saved with id: \(id)")
+                self?.actionClear()
+                }, onError: { [weak self] error in
+                    self?.showMessage("Error", description: error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
 
-  }
+    @IBAction func actionAdd() {
+        guard let viewController = storyboard!.instantiateViewController(withIdentifier: "PhotosViewController") as? PhotosViewController else { return }
+        viewController.selectedPhotos
+            .subscribe(
+                onNext: { [weak self] newImage in
+                    guard let this = self else { return }
+                    this.images.value.append(newImage)
+                },
+                onDisposed: {
+                    print("Completed photo selection")
+            }).disposed(by: disposeBag)
+        navigationController?.pushViewController(viewController, animated: true)
+    }
 
-  func showMessage(_ title: String, description: String? = nil) {
-    let alert = UIAlertController(title: title, message: description, preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { [weak self] _ in self?.dismiss(animated: true, completion: nil)}))
-    present(alert, animated: true, completion: nil)
-  }
+    func showMessage(_ title: String, description: String? = nil) {
+        let alert = UIAlertController(title: title, message: description, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { [weak self] _ in self?.dismiss(animated: true, completion: nil)}))
+        present(alert, animated: true, completion: nil)
+    }
 }
