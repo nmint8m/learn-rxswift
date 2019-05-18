@@ -262,9 +262,207 @@ Perfect! ✅
 
 ### Creating a custom observable
 
+Để wrap up phần này, ta sẽ tạo một Observable custom và chuyển Apple API cơ bản thành một reactive class. Ta sẽ xài Photos framework để lưu photo collage in reactive way!
+
+Ta sẽ tạo một class mới tên PhotoWriter hay vì viết reactive extension cho PHPhotoLibrary:
+
+<center>
+	<img src="./Document/Image/Section1/c4-img11.png" height="300">
+</center>
+
+Nếu image được lưu lại thành công thì ta sẽ phát asset ID và và `.complete` event, nếu không thì phát ra `.error` event.
+
+#### Wrapping an existing API
+
+Mở `PhotoWriter.swift`, import RxSwift:
+
+```swift
+import RxSwift
+```
+
+Thêm mới static method sau vào `PhotoWriter`, có nhiệm vụ tạo ra một observable thông báo ta muốn lưu photo:
+
+```swift
+    static func save(_ image: UIImage) -> Observable<String> {
+        return Observable.create({ observer in
+        })
+    }
+```
+
+`save(_:)` sẽ trả về một `Observable<String>`, bởi sau khi lưu lại photo, ta sẽ phát ra một element chứa local identifier của asset mà ta vừa tạo.
+
+`Observable.create(_)` sẽ tạo `Observable` mới, điều ta cần làm là thêm một vài xử lý vào đoạn closure sau cùng. Thêm đoạn code sau vào closure của `Observable.create(_)`:
+
+```swift
+var savedAssetId: String?
+PHPhotoLibrary.shared().performChanges({
+// first closure
+}, completionHandler: { success, error in
+// second closure
+})
+```
+
+Trong first closure, tạo ra một photo asset mới bằng cách sử dụng `PHAssetChangeRequest.creationRequestForAsset(from:)` và lưu identifier của nó trong `savedAssetId`:
+
+```swift
+let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
+savedAssetId = request.placeholderForCreatedAsset?.localIdentifier
+```
+
+Ở second closure `completionHandler`, nếu ta nhận success response và `savedAssetId` not null, ta sẽ phát `.next` và `.completed` event. Trong trường hợp ngược lại, chúng ta sẽ phát custom error hoặc một default error nào đó:
+
+```swift
+DispatchQueue.main.async {
+    if success, let id = savedAssetId {
+        observer.onNext(id)
+        observer.onCompleted()
+    } else {
+        observer.onError(Errors.couldNotSavePhoto)
+    }
+}
+```
+
+Tới đây thì phần logic đã hoàn thành. Tuy nhiên ta phải return `Disposable` ở ngoài closure. Thêm dòng code sau:
+
+```swift
+return Disposables.create()
+```
+
+Đoạn code hoàn thành sẽ như sau:
+
+```swift
+static func save(_ image: UIImage) -> Observable<String> {
+    return Observable.create({ observer in
+        var savedAssetId: String?
+        PHPhotoLibrary.shared().performChanges({
+            let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
+            savedAssetId = request.placeholderForCreatedAsset?.localIdentifier
+        }, completionHandler: { success, error in
+            DispatchQueue.main.async {
+                if success, let id = savedAssetId {
+                    observer.onNext(id)
+                    observer.onCompleted()
+                } else {
+                    observer.onError(Errors.couldNotSavePhoto)
+                }
+            }
+        })
+        return Disposables.create()
+    })
+}
+```
+
+Ôn lại một tý kiến thức ở [chapter trước][Chapter 3]. Chúng ta có thể tạo ra một `Observable` bằng một trong những cách sau:
+
+- Observable.never(): Tạo observable sequences không bao giờ phát ra element nào.
+- Observable.just(_:): Phát ra một element và một `.completed` event.
+- Observable.empty(): Không phát ra element  followed by a .completed event.
+
+Như vậy, observable có thể cung cấp bất kỳ loại event nào, từ event không phát tới phát nhiều `.next` element, có thể terminate được bởi sự kiện `.completed` hay là `.error`.
+
+Đối với trường hợp của PhotoWriter, chúng ta chỉ cần quan tâm một event duy nhất. Vậy nên tác vụ save chỉ cần hoàn thành một lần duy nhất. Chúng ta sẽ dùng `.next` kết hợp với `.completed` event cho trường hợp lưu thành công; và `.error` cho trường hợp lưu thất bại.
+
+Có thể trong phần trước, bạn đã đặt câu hỏi `Single` dùng để làm gì. Thì giờ bạn đã có câu trả lời rồi đấy.
+
 ### RxSwift traits in practice
 
-### Completable
+Ở [Chapter 2][Chapter 2] Observables chúng ta đã tìm hiểu một chút về RxSwift trait được sử dụng trong một số trường hợp cụ thể.
+
+Trong chapter này, chúng ta sẽ lướt sơ lại và ứng dụng một số traits trong project `Combinestagram`. Hãy bắt đầu với `Single`.
+
+#### Single
+
+Ở trong Chapter 2, Single được giới thiệu là một Observable đặc biệt. Nó chỉ phát duy nhất một sự kiện `.success(Value)` hoặc là một `.error`, được mô tả ngay bên dưới.
+
+<center>
+	<img src="./Document/Image/Section1/c4-img12.png" width="200">
+</center>
+
+Loại trait này hữu ích trong một số tình huống khi lưu file, download file, load file từ disk, hoặc bất cứ tác vụ bất đồng bộ nào trả về một value nào đấy. Chúng ta có thể phân loại thành 2 use case của `Single`:
+
+1. Để đóng gói các tác vụ cần phát duy nhất một element khi thành công, giống như tác vụ `PhotoWriter.save(_)` được nhắc tới phía trên. Chúng ta có thể trực tiếp tạo ra một `Single` thay vì `Observable`. Thực tế là chúng ta sẽ thay đổi `save(_)` method trong `PhotoWriter` tạo ra `Single` trong phần chapter challenge.
+2. Để diễn tả một cách tốt hơn cái ý định sử dụng duy nhất một element của observable sequence và để chắc chắn rằng nếu như sequence đó phát ra nhiều hơn một element thì các subcription của nó sẽ nhận error. Để đạt được điều này, chúng ta có thể subcribe bất cứ một observable nào và sử dụng hàm `.asSingle()` để convert ra `Single`.
+
+#### Maybe
+
+`Maybe` khá giống với `Single`, điểm duy nhất khác biệt là observable này có thể không phát ra value khi completion thành công.
+
+<center>
+	<img src="./Document/Image/Section1/c4-img13.png" width="200">
+</center>
+
+Nếu đưa vào ví dụ về photograph, hãy tưởng tượng trong trường hợp của use case `Maybe`, app của chúng ta đang lưu lại các photos vào photo album. Chúng ta cố gắng sử dụng album identifier trong UserDefaults và sử dụng ID đó để mở album ra và lưu photo vào trỏng. Chúng ta sẽ phải thiết kế method `open(albumId:) -> Maybe<String>` để handle các trường hợp sau:
+
+1. Trong trường hợp album với ID đó tồn tại, phát ra `.completed` evebt
+2. Trong trường hợp người dùng đã delete album đó rồi, tạo một album mới và phát `.next` event với value là ID mới và lưu nó lại vào UserDefaults.
+3. Trong trường hợp nó bị lỗi ở đâu đó làm chúng ta không thể truy cập vào album được, phát `.error` event.
+
+Cũng giống như các traits khác, chúng ta vẫn có thể đạt được chức năng tương tự khi sử dụng `Observable`, tuy nhiên `Maybe` cung cấp ngữ cảnh cụ thể, dễ hiểu hơn cho chúng ta lẫn các developer khác khi đọc code sau này.
+
+Cũng tương tự như `Single`, chúng ta có thể tạo ra `Maybe` bằng cách sử dụng `Maybe.create({ ... })` hoặc `.asMaybe()`.	
+
+#### Completable
+
+Trait cuối cùng mình muốn nhắc đến là `Completable`, nó cho phép duy nhất `.completed` hoặc `.error` event được phát ra trước khi subcription bị dispose.
+
+<center>
+	<img src="./Document/Image/Section1/c4-img14.png" width="200">
+</center>
+
+Cần lưu ý, chúng ta không thể convert obserable sequence thành completable. Bởi vì các tác vụ của observable luôn cho phép phát ra value, chúng ta không thể nào convert qua lại giữa hai loại này.
+
+Chúng ta chỉ có thể tạo ra completable sequence bằng `Completable.create({ ... })`.
+
+`Completable` được sử dụng chỉ khi bạn cần biết một tác vụ đồng bộ đã thành công hay thất bại.
+
+Ví dụ: Chúng ta có một app có tính năng auto-save document khi người dùng đang làm việc với nó. Chúng ta muốn lưu document một cách bất đồng bộ ở background queue và khi nào nó hoàn thành, chúng ta sẽ show một notification nho nhỏ hoặc alert box ngay trên màn hình nếu tác vụ fail.
+
+Chúng ta sẽ implement bằng cách viết saving logic vào function `aveDocument() -> Completable`. Và đoạn code dưới đây sẽ giải quyết logic còn lại.
+
+```swift
+saveDocument()
+    .andThen(Observable.from(createMessage))
+    .subscribe(onNext: { message in
+        message.display()
+    }, onError: {e in
+        alert(e.localizedDescription)
+    })
+```
+
+`andThen` cho phép chúng ta có thể móc nối nhiều completables hoặc observables khi chúng phát ra `.success` event và subcribe final result. Trong trường hợp một trong số chúng phát ra error, code sẽ fall through `onError` closure.
+
+#### Subscribing to the custom observable
+
+Feature lưu photo vào Photos library sẽ rơi vào một trong số những trường hợp đặc biệt sử dụng trait. Observable `PhotoWriter.save(_)` sẽ chỉ phát một lần (new asset ID) hoặc là error, cho nên chúng ta sẽ xài `Single` cho trường hợp này.
+
+Mở `MainViewController.swift` add đoạn code này vào `actionSave()` cho Save button:
+
+```swift
+    @IBAction func actionSave() {
+        guard let image = imagePreview.image else { return }
+        PhotoWriter.save(image)
+            .asSingle()
+            .subscribe(onSuccess: { [weak self] id in
+                self?.showMessage("Saved with id: \(id)")
+                self?.actionClear()
+                }, onError: { [weak self] error in
+                    self?.showMessage("Error", description: error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
+```
+
+Đoạn code trên mô tả chúng ta đang gọi `PhotoWriter.save(image)` để lưu bộ sưu tập hiện tại. Sau đó chúng ta convert `Observable` thành `Single`, để đảm bảo rằng subcription sẽ chỉ nhật duy nhất một element, và hiển thị một message cho biết tác vụ hoàn thành thành công hay thất bại. Thêm vào đó chúng ta clear bộ sưu tập hiện tại nếu tác vụ lưu thành công.
+
+> *Note:* `asSingle()` sẽ đảm bảo rằng chúng ta chỉ nhận được duy nhất một element bằng cách throw error nếu sequence phát nhiều hơn một element.
+
+Chạy app nào và vào Photos để check kết quả nhé!
+
+<center>
+<img src="./Document/Image/Section1/c4-img15.png" width="300">
+<img src="./Document/Image/Section1/c4-img16.png" width="300">
+<img src="./Document/Image/Section1/c4-img17.png" width="300">
+</center>
 
 ## More
 
@@ -279,7 +477,6 @@ Quay lại [RxSwiftDiary's Menu][Diary]
 [RxSwift: Reactive Programming with Swift][Reference] 
 
 ---
-[Chapter 2]: ./Section1-Chapter2.md "Observables"
 [Chapter 3]: ./Section1-Chapter3.md "Subjects"
 [Chapter 5]: ./Section2-Chapter5.md "Filtering operators"
 [Diary]: https://github.com/nmint8m/rxswiftdiary "RxSwift Diary"
