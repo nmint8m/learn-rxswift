@@ -63,11 +63,25 @@ class MainViewController: UIViewController {
 
     @IBAction func actionSave() {
         guard let image = imagePreview.image else { return }
+        /* Original version
         PhotoWriter.save(image)
             .asSingle()
             .subscribe(onSuccess: { [weak self] id in
                 self?.showMessage("Saved with id: \(id)")
                 self?.actionClear()
+                }, onError: { [weak self] error in
+                    self?.showMessage("Error", description: error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+         */
+
+        // Challenge 2: Add custom observable to present alerts
+        PhotoWriter
+            .save(image)
+            .subscribe(
+                onSuccess: { [weak self] id in
+                    self?.showMessage("Saved with id: \(id)")
+                    self?.actionClear()
                 }, onError: { [weak self] error in
                     self?.showMessage("Error", description: error.localizedDescription)
             })
