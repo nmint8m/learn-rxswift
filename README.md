@@ -11,17 +11,17 @@ Dựa trên câu chuyện có thật của một developer, `RxSwiftDiary` lưu 
 - [Chapter 1: Hello RxSwift][Chapter 1]
 - [Chapter 2: Observables][Chapter 2]
 - [Chapter 3: Subjects][Chapter 3]
-- [Chapter 4: Observables and Subjects in practice][Chapter 4] `[/WIP]`
+- [Chapter 4: Observables and Subjects in practice][Chapter 4]
 
 ### Section II: Operatores and best practices
 
-- [Chapter 5: Filtering operators][Chapter 5] `[/WIP]`
-- [Chapter 6: Filtering operators in practice][Chapter 6] `[/WIP]`
-- [Chapter 7: Transforming operators][Chapter 7] `[/WIP]`
-- [Chapter 8: Transforming operators in practice][Chapter 8] `[/WIP]`
-- [Chapter 9: Combining operators][Chapter 9] `[/WIP]`
-- [Chapter 10: Combining operators in practice][Chapter 10] `[/WIP]`
-- [Chapter 11: Time-based operators][Chapter 11] `[/WIP]`
+- [Chapter 5: Filtering operators][Chapter 5]
+- [Chapter 6: Filtering operators in practice][Chapter 6]
+- [Chapter 7: Transforming operators][Chapter 7] 
+- [Chapter 8: Transforming operators in practice][Chapter 8]
+- [Chapter 9: Combining operators][Chapter 9]
+- [Chapter 10: Combining operators in practice][Chapter 10]
+- [Chapter 11: Time-based operators][Chapter 11]
 
 ### Section III: iOS Apps with RxCocoa
 
