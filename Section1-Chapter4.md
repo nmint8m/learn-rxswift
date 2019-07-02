@@ -1,8 +1,8 @@
 _Written by: **Nguyen Minh Tam**_
 
-# Section I: Getting started with RxSwift
+# <img src="./Document/Image/img-rx.png" height ="30"> Section I: Getting started with RxSwift
 
-## Chapter 4: Observables and Subjects in practice
+## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 4: Observables and Subjects in practice
 
 Tính đến thời điểm này, chúng ta đã có thể hiểu được cách hoạt động của observable và của các loại subject khác nhau và học được cách khởi tạo, cách làm việc với chúng qua playground.
 
