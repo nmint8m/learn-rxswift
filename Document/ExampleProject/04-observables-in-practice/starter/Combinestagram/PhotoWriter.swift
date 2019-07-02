@@ -57,7 +57,7 @@ class PhotoWriter {
     }
      */
 
-    // Challenge 1: It's only logical to use a Single
+    // Chapter 4: Challenge 1: It's only logical to use a Single
     static func save(_ image: UIImage) -> Single<String> {
         return Single.create { single -> Disposable in
             var savedAssetId: String?
@@ -77,5 +77,4 @@ class PhotoWriter {
         }
     }
 }
-
 

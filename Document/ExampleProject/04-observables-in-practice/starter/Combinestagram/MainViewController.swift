@@ -32,6 +32,8 @@ class MainViewController: UIViewController {
 
     private let disposeBag = DisposeBag()
     private let images = Variable<[UIImage]>([])
+    // # Implementing a basic uniqueness filter
+    private var imageCache = [Int]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,11 +45,21 @@ class MainViewController: UIViewController {
                 preview.image = UIImage.collage(images: photos,
                                                 size: preview.frame.size)
             }).disposed(by: disposeBag)
+
         images.asObservable()
             .subscribe(onNext: { [weak self] photos in
                 guard let this = self else { return }
                 this.updateUI(photos: photos)
             }).disposed(by: disposeBag)
+
+        // # Using throttle to reduce work on subscriptions with high load
+        images.asObservable()
+            .throttle(0.5, scheduler: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] photos in
+                self.imagePreview.image = UIImage.collage(images: photos,
+                                                          size: self.imagePreview.frame.size)
+            })
+            .disposed(by: disposeBag)
     }
 
     private func updateUI(photos: [UIImage]) {
@@ -59,6 +71,7 @@ class MainViewController: UIViewController {
 
     @IBAction func actionClear() {
         images.value = []
+        imageCache = []
     }
 
     @IBAction func actionSave() {
@@ -90,6 +103,7 @@ class MainViewController: UIViewController {
 
     @IBAction func actionAdd() {
         guard let viewController = storyboard!.instantiateViewController(withIdentifier: "PhotosViewController") as? PhotosViewController else { return }
+        /* Original code
         viewController.selectedPhotos
             .subscribe(
                 onNext: { [weak self] newImage in
@@ -100,11 +114,71 @@ class MainViewController: UIViewController {
                     print("Completed photo selection")
             }).disposed(by: disposeBag)
         navigationController?.pushViewController(viewController, animated: true)
+         */
+
+        // # Sharing subscriptions
+        let shareSelectedPhotos = viewController.selectedPhotos.share()
+        shareSelectedPhotos
+            // # Keep taking elements while a condition is met
+            .takeWhile{ [weak self] _ in
+                guard let this = self else { return false }
+                return this.images.value.count < 6
+            }
+            // # Filtering elements you donʼt need
+            .filter { newImage in
+                return newImage.size.width > newImage.size.height
+            }
+            // # Implementing a basic uniqueness filter
+            .filter { [weak self] newImage in
+                guard let this = self else { return false }
+                let imageLenght = UIImagePNGRepresentation(newImage)?.count ?? 0
+                guard !this.imageCache.contains(imageLenght) else {
+                    return false
+                }
+                this.imageCache.append(imageLenght)
+                return true
+            }
+            .subscribe(
+            onNext: { [weak self] newImage in
+                guard let this = self else { return }
+                this.images.value.append(newImage)
+            },
+            onDisposed: {
+                print("Completed photo selection")
+            }).disposed(by: disposeBag)
+
+        shareSelectedPhotos
+            // # Ignoring all elements
+            .ignoreElements()
+            .subscribe(onCompleted: { [weak self] in
+                guard let this = self else { return }
+                this.updateNavigationIcon()
+            }).disposed(by: viewController.bag)
+
+        navigationController?.pushViewController(viewController, animated: true)
     }
 
-    func showMessage(_ title: String, description: String? = nil) {
+    func showMessage(_ title: String, description: String = "") {
+        /* Original code
         let alert = UIAlertController(title: title, message: description, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { [weak self] _ in self?.dismiss(animated: true, completion: nil)}))
         present(alert, animated: true, completion: nil)
+         */
+        // # Chapter 4: Challenge 2: Add custom observable to present alerts
+        alert(title: title, message: description)
+            .subscribe(onCompleted: { [weak self] in
+                guard let this = self else { return }
+                this.dismiss(animated: true, completion: nil)
+            }).disposed(by: disposeBag)
+    }
+
+    // # Ignoring all elements
+    private func updateNavigationIcon() {
+        let icon = imagePreview.image?
+            .scaled(CGSize(width: 22, height: 22))
+            .withRenderingMode(.alwaysOriginal)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: icon, style: .done,
+                                                           target: nil, action: nil)
     }
 }
+
