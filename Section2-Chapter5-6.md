@@ -1,4 +1,4 @@
-# Section II: Operators and Best Practices
+# <img src="./Document/Image/img-rx.png" height ="30"> Section II: Operators and Best Practices
 
 - Operator là những building block của Rx, được sử dụng để chuyển đổi, xử lý và phản hồi lại các event được phát ra bởi các observanles.
 - Tương tự như việc kết hợp +-*/ để tạo ra một phép toán phức tạp, ta có thể kết nối (chain) và biên soạn các operator đơn giản của Rx thành một logic app phức tạp.
@@ -8,7 +8,7 @@
 - Kết hợp các operators với nhau.
 
 **Nội dung:**
-- [Section II: Operators and Best Practices](#Section-II-Operators-and-Best-Practices)
+
   - [Chapter 5: Filtering Operators](#Chapter-5-Filtering-Operators)
     - [Ignoring operators](#Ignoring-operators)
       - [ignoreElements()](#ignoreElements)
@@ -25,6 +25,9 @@
     - [Distinct operators](#Distinct-operators)
       - [distinctUntilChanged()](#distinctUntilChanged)
     - [Challenges](#Challenges)
+
+<br>
+
   - [Chapter 6: Filtering Operators in Practice](#Chapter-6-Filtering-Operators-in-Practice)
     - [Improving the Combinestagram project](#Improving-the-Combinestagram-project)
     - [Sharing subscriptions](#Sharing-subscriptions)
@@ -43,7 +46,9 @@
   - [More](#More)
   - [Reference](#Reference)
 
-## Chapter 5: Filtering Operators
+<br>
+
+## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 5: Filtering Operators
 
 Sử dụng filtering operators để giới hạn `.next` event, để các subscriber chỉ nhận những elements cần thiết đối với chúng.
 
@@ -304,7 +309,10 @@ Observable<NSNumber>.of(10, 110, 20, 200, 210, 310)
         }).disposed(by: disposeBag)
 ```
 
-## Chapter 6: Filtering Operators in Practice
+<br>
+<br>
+
+## <img src="./Document/Image/img-rx.png" height ="25"> Chapter 6: Filtering Operators in Practice
 
 ### Improving the Combinestagram project
 
@@ -659,6 +667,45 @@ Một số trường hợp áp dụng tương tự:
 - Khi user kéo thả screen, cần throttle vị trí chạm vào và chỉ quan tâm đến element chỗ vị trí hiện tạ dừng lại. (The user is dragging their finger across the screen and you are interested only in the spots where they stop for a moment. You can throttle the current touch location and only consider only the elements where the current location stops changing.)
 
 ### Challenge
+
+#### Challenge 1
+
+```swift
+// MainViewController.swift
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Chapter 6: Challenge 1: Combinestagramʼs source code
+
+        let imagesObservable = images.asObservable().share()
+
+        // Erase a subscription here
+
+        imagesObservable
+            .subscribe(onNext: { [weak self] photos in
+                guard let this = self else { return }
+                this.updateUI(photos: photos)
+            }).disposed(by: disposeBag)
+
+        // # Using throttle to reduce work on subscriptions with high load
+        imagesObservable
+            .throttle(0.5, scheduler: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] photos in
+                self.imagePreview.image = UIImage.collage(images: photos,
+                                                          size: self.imagePreview.frame.size)
+            })
+            .disposed(by: disposeBag)
+    }
+```
+
+```swift
+    @IBAction func actionClear() {
+        images.value = []
+        imageCache = []
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: nil, style: .done,
+                                                           target: nil, action: nil)
+    }
+```
 
 ## More
 
