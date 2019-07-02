@@ -518,6 +518,30 @@ extension UIViewController {
 }
 ```
 
+hoặc:
+
+```swift
+func alert(title: String = "",
+           message: String = "") -> Observable<Bool> {
+    return Observable.create { [weak self] observable in
+        guard let this = self else {
+            observable.onCompleted()
+            return Disposables.create()
+        }
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Close", style: .default) { _ in
+            alert.dismiss(animated: true, completion: nil)
+            observable.onCompleted()
+        }
+        alert.addAction(action)
+        this.present(alert, animated: true, completion: nil)
+        return Disposables.create()
+    }
+}
+```
+
 
 ## More
 
