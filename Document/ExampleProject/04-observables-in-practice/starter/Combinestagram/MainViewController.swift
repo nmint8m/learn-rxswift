@@ -38,22 +38,18 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        images.asObservable()
-            .subscribe(onNext: { [weak self] photos in
-                guard let this = self,
-                    let preview = this.imagePreview else { return }
-                preview.image = UIImage.collage(images: photos,
-                                                size: preview.frame.size)
-            }).disposed(by: disposeBag)
+        // Chapter 6: Challenge 1: Combinestagramʼs source code
 
-        images.asObservable()
+        let imagesObservable = images.asObservable().share()
+
+        imagesObservable
             .subscribe(onNext: { [weak self] photos in
                 guard let this = self else { return }
                 this.updateUI(photos: photos)
             }).disposed(by: disposeBag)
 
         // # Using throttle to reduce work on subscriptions with high load
-        images.asObservable()
+        imagesObservable
             .throttle(0.5, scheduler: MainScheduler.instance)
             .subscribe(onNext: { [unowned self] photos in
                 self.imagePreview.image = UIImage.collage(images: photos,
@@ -72,6 +68,10 @@ class MainViewController: UIViewController {
     @IBAction func actionClear() {
         images.value = []
         imageCache = []
+
+        // Chapter 6: Challenge 1: Combinestagramʼs source code
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: nil, style: .done,
+                                                           target: nil, action: nil)
     }
 
     @IBAction func actionSave() {
