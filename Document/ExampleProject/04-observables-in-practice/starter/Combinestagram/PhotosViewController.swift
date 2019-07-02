@@ -31,6 +31,7 @@ class PhotosViewController: UICollectionViewController {
     var selectedPhotos: Observable<UIImage> {
         return selectedPhotosSubject.asObservable()
     }
+    var bag = DisposeBag()
 
     // MARK: private properties
     private lazy var photos = PhotosViewController.loadPhotos()
@@ -51,7 +52,29 @@ class PhotosViewController: UICollectionViewController {
     // MARK: View Controller
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        // # Reload the photos collection when access is granted
+        let authorize = PHPhotoLibrary.authorized.share()
+        authorize
+            .skipWhile { return !$0 }
+            .take(1).subscribe(onNext: { [weak self] _ in
+                guard let this = self else { return }
+                DispatchQueue.main.async {
+                    this.photos = PhotosViewController.loadPhotos()
+                    this.collectionView?.reloadData()
+                }
+            }).disposed(by: bag)
+        // # Display an error message if the user doesnʼt grant access
+        authorize
+            .skip(1)
+            .takeLast(1)
+            .filter { return !$0 }
+            .subscribe(onNext: { [weak self] _ in
+                guard let this = self else { return }
+                DispatchQueue.main.async {
+                    this.errorMessage()
+                }
+            }
+        ).disposed(by: bag)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -95,4 +118,18 @@ class PhotosViewController: UICollectionViewController {
             }
         })
     }
+
+    // # Display an error message if the user doesnʼt grant access
+    private func errorMessage() {
+        alert(title: "No access to Camera Roll",
+              message: "You can grant access to Combinestagram from the Settings app")
+            // # Completing a subscription after given time interval
+            .take(5, scheduler: MainScheduler.instance)
+            .subscribe(onCompleted: { [weak self] in
+                self?.dismiss(animated: true, completion: nil)
+                _ = self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: bag)
+    }
 }
+

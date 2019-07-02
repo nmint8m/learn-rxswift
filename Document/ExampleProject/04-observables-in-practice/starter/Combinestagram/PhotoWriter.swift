@@ -35,8 +35,9 @@ class PhotoWriter {
         return selectedPhotosSubject.asObservable()
     }
 
+    /* // Original version
     static func save(_ image: UIImage) -> Observable<String> {
-        return Observable.create({ observer in
+        return Observable.create { observer in
             var savedAssetId: String?
             PHPhotoLibrary.shared().performChanges({
                 let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
@@ -52,8 +53,28 @@ class PhotoWriter {
                 }
             })
             return Disposables.create()
-        })
+        }
+    }
+     */
+
+    // Chapter 4: Challenge 1: It's only logical to use a Single
+    static func save(_ image: UIImage) -> Single<String> {
+        return Single.create { single -> Disposable in
+            var savedAssetId: String?
+            PHPhotoLibrary.shared().performChanges({
+                let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
+                savedAssetId = request.placeholderForCreatedAsset?.localIdentifier
+            }, completionHandler: { success, error in
+                DispatchQueue.main.async {
+                    if success, let id = savedAssetId {
+                        single(.success(id))
+                    } else {
+                        single(.error(Errors.couldNotSavePhoto))
+                    }
+                }
+            })
+            return Disposables.create()
+        }
     }
 }
-
 

@@ -16,6 +16,7 @@ Trong chapter này, chúng ta sẽ làm việc với một app hoàn thiện đ�
 - [Creating a custom observable](#creating-a-custom-observable)
 - [RxSwift traits in practice](#rxswift-traits-in-practice)
 - [Completable](#completable)
+- [Challenge](#challenge)
 
 ### Getting started
 
@@ -463,6 +464,84 @@ Chạy app nào và vào Photos để check kết quả nhé!
 <img src="./Document/Image/Section1/c4-img16.png" width="300">
 <img src="./Document/Image/Section1/c4-img17.png" width="300">
 </center>
+
+### Challenge
+
+#### Challenge 1
+
+```swift
+// PhotoWriter.swift
+static func save(_ image: UIImage) -> Single<String> {
+    return Single.create { single -> Disposable in
+        var savedAssetId: String?
+        PHPhotoLibrary.shared().performChanges({
+            let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
+            savedAssetId = request.placeholderForCreatedAsset?.localIdentifier
+        }, completionHandler: { success, error in
+            DispatchQueue.main.async {
+                if success, let id = savedAssetId {
+                    single(.success(id))
+                } else {
+                    single(.error(Errors.couldNotSavePhoto))
+                }
+            }
+        })
+        return Disposables.create()
+    }
+}
+```
+
+#### Challenge 2
+
+```swift
+// UIViewControllerExt.swift
+extension UIViewController {
+    func alert(title: String = "",
+               message: String = "") -> Completable {
+        return Completable.create { [weak self] completable in
+            guard let this = self else {
+                completable(.completed)
+                return Disposables.create()
+            }
+            let alert = UIAlertController(title: title,
+                                          message: message,
+                                          preferredStyle: .alert)
+            let action = UIAlertAction(title: "Close", style: .default) { _ in
+                alert.dismiss(animated: true, completion: nil)
+                completable(.completed)
+            }
+            alert.addAction(action)
+            this.present(alert, animated: true, completion: nil)
+            return Disposables.create()
+        }
+    }
+}
+```
+
+hoặc:
+
+```swift
+func alert(title: String = "",
+           message: String = "") -> Observable<Bool> {
+    return Observable.create { [weak self] observable in
+        guard let this = self else {
+            observable.onCompleted()
+            return Disposables.create()
+        }
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Close", style: .default) { _ in
+            alert.dismiss(animated: true, completion: nil)
+            observable.onCompleted()
+        }
+        alert.addAction(action)
+        this.present(alert, animated: true, completion: nil)
+        return Disposables.create()
+    }
+}
+```
+
 
 ## More
 
