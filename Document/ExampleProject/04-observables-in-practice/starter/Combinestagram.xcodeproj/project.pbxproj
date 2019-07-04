@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		229E802B22C8F16B00E19807 /* PHPhotoLibrary+rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229E802A22C8F16B00E19807 /* PHPhotoLibrary+rx.swift */; };
-		229E802D22C904EA00E19807 /* UIViewControllerExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229E802C22C904EA00E19807 /* UIViewControllerExt.swift */; };
 		7A16B3580529618C58E217FF /* Pods_Combinestagram.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7AB227815F361FE215389B /* Pods_Combinestagram.framework */; };
 		9CDD7B041DE5AABE0058B2D5 /* UIImage+Collage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDD7B031DE5AABE0058B2D5 /* UIImage+Collage.swift */; };
 		9CDD7B061DE5BC660058B2D5 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDD7B051DE5BC660058B2D5 /* PhotosViewController.swift */; };
@@ -23,8 +21,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		229E802A22C8F16B00E19807 /* PHPhotoLibrary+rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHPhotoLibrary+rx.swift"; sourceTree = "<group>"; };
-		229E802C22C904EA00E19807 /* UIViewControllerExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExt.swift; sourceTree = "<group>"; };
 		2A7AB227815F361FE215389B /* Pods_Combinestagram.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Combinestagram.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		79B7C919AA1883B684FF2F8D /* Pods-Combinestagram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Combinestagram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Combinestagram/Pods-Combinestagram.debug.xcconfig"; sourceTree = "<group>"; };
 		9CDD7B031DE5AABE0058B2D5 /* UIImage+Collage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = "UIImage+Collage.swift"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -111,8 +107,6 @@
 				9CE7E5DE1DE5A40A00C8BA5A /* MainViewController.swift */,
 				9CDD7B051DE5BC660058B2D5 /* PhotosViewController.swift */,
 				9CDD7B071DE6D7ED0058B2D5 /* PhotoCell.swift */,
-				229E802A22C8F16B00E19807 /* PHPhotoLibrary+rx.swift */,
-				229E802C22C904EA00E19807 /* UIViewControllerExt.swift */,
 			);
 			path = Combinestagram;
 			sourceTree = "<group>";
@@ -137,6 +131,7 @@
 				9CE7E5D61DE5A40900C8BA5A /* Frameworks */,
 				9CE7E5D71DE5A40900C8BA5A /* Resources */,
 				6E8FE0EEF876CE4BE27E3DAE /* [CP] Embed Pods Frameworks */,
+				5CAA6C761B8057FE855103D0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -170,7 +165,6 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -217,13 +211,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		5CAA6C761B8057FE855103D0 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Combinestagram/Pods-Combinestagram-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		6E8FE0EEF876CE4BE27E3DAE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Combinestagram/Pods-Combinestagram-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Combinestagram/Pods-Combinestagram-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -232,7 +241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Combinestagram/Pods-Combinestagram-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Combinestagram/Pods-Combinestagram-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -242,9 +251,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				229E802B22C8F16B00E19807 /* PHPhotoLibrary+rx.swift in Sources */,
 				9CDD7B041DE5AABE0058B2D5 /* UIImage+Collage.swift in Sources */,
-				229E802D22C904EA00E19807 /* UIViewControllerExt.swift in Sources */,
 				9CDD7B081DE6D7ED0058B2D5 /* PhotoCell.swift in Sources */,
 				9CDD7B061DE5BC660058B2D5 /* PhotosViewController.swift in Sources */,
 				9CDD7B0C1DE6E3D30058B2D5 /* PhotoWriter.swift in Sources */,
