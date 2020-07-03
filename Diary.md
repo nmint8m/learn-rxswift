@@ -17,5 +17,11 @@ Quyết chí ắt làm nên
 ```
 
 ```
+Thứ sáu, ngày 03 tháng 07 năm 2020
+---
+Lỡ tay push lên master. Giận bản thân thật sự luôn.
+```
+
+```
 To be continue.
 ```
